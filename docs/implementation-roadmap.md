@@ -75,10 +75,10 @@ Objective: behaviour, psychomotor, incidents, homework, parent contact, extended
 
 Dependencies: core people/classes model.
 
-Complexity: large. Status: lesson planning and timetable demo slices are
-implemented with in-memory seed data. Academic calendar, resources, tasks,
+Complexity: large. Status: lesson planning, timetable, and academic calendar
+demo slices are implemented with in-memory seed data. Resources, tasks,
 behaviour, psychomotor, incidents, homework, parent contact, production
-scheduling, and timetable write operations are not started.
+scheduling, and scheduling write operations are not started.
 
 ## Phase G: Advanced Features
 
@@ -110,4 +110,5 @@ preserving the service boundaries in `src/lib/server/classes-service.ts` and
 `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`,
 `src/lib/server/assessments-service.ts`, `src/lib/server/gradebook-service.ts`,
 `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`,
-`src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`.
+`src/lib/server/academic-calendar-service.ts`, `src/lib/server/reports-service.ts`,
+and `src/lib/server/approvals-service.ts`.

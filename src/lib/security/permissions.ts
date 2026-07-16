@@ -4,6 +4,7 @@ export const permissions = [
   "class.view_assigned",
   "class.manage",
   "timetable.view",
+  "calendar.view",
   "attendance.record",
   "attendance.view_reports",
   "lesson.view",

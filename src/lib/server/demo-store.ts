@@ -158,6 +158,37 @@ export interface DemoTimetableEvent {
   linkedAssessmentId?: string;
 }
 
+export type DemoAcademicCalendarEventType =
+  | "term"
+  | "assessment_window"
+  | "reporting"
+  | "school_event"
+  | "holiday"
+  | "planning";
+export type DemoAcademicCalendarEventStatus = "upcoming" | "active" | "completed" | "at_risk";
+export type DemoAcademicCalendarVisibility = "workspace" | "class" | "teacher";
+export type DemoAcademicCalendarPriority = "normal" | "important" | "urgent";
+
+export interface DemoAcademicCalendarEvent {
+  id: string;
+  workspaceId: string;
+  classId?: string;
+  ownerMembershipId?: string;
+  title: string;
+  type: DemoAcademicCalendarEventType;
+  status: DemoAcademicCalendarEventStatus;
+  visibility: DemoAcademicCalendarVisibility;
+  priority: DemoAcademicCalendarPriority;
+  startDate: string;
+  endDate: string;
+  location?: string;
+  description: string;
+  requiredAction: string;
+  linkedTimetableEventId?: string;
+  linkedAssessmentId?: string;
+  linkedReportClassId?: string;
+}
+
 export type DemoGradebookScoreStatus = "scored" | "missing" | "excused";
 
 export interface DemoGradebookScore {
@@ -311,6 +342,7 @@ export const demoMemberships: DemoMembership[] = [
       "workspace.select",
       "class.view_assigned",
       "timetable.view",
+      "calendar.view",
       "attendance.record",
       "attendance.view_reports",
       "lesson.view",
@@ -339,6 +371,7 @@ export const demoMemberships: DemoMembership[] = [
       "class.view_assigned",
       "class.manage",
       "timetable.view",
+      "calendar.view",
       "attendance.record",
       "attendance.view_reports",
       "lesson.view",
@@ -368,6 +401,7 @@ export const demoMemberships: DemoMembership[] = [
       "workspace.select",
       "class.view_assigned",
       "timetable.view",
+      "calendar.view",
       "attendance.record",
       "lesson.view",
       "lesson.create",
@@ -1086,6 +1120,126 @@ export const demoTimetableEvents: DemoTimetableEvent[] = [
   },
 ];
 
+export const demoAcademicCalendarEvents: DemoAcademicCalendarEvent[] = [
+  {
+    id: "calendar-first-term",
+    workspaceId: "school-truth",
+    title: "First Term",
+    type: "term",
+    status: "active",
+    visibility: "workspace",
+    priority: "important",
+    startDate: "2026-06-08",
+    endDate: "2026-08-21",
+    description: "Active 2026/2027 first term window with week-six teaching pace checks.",
+    requiredAction: "Keep weekly plans aligned to the active term pacing guide.",
+  },
+  {
+    id: "calendar-teacher-pacing",
+    workspaceId: "school-truth",
+    ownerMembershipId: "mem-truth-teacher-ade",
+    title: "Personal Pacing Review",
+    type: "planning",
+    status: "active",
+    visibility: "teacher",
+    priority: "normal",
+    startDate: "2026-07-16",
+    endDate: "2026-07-16",
+    location: "Planning Desk",
+    description: "Teacher-owned planning checkpoint for clearing lesson prep after timetable blocks.",
+    requiredAction: "Convert open prep flags into a short checklist before close of day.",
+  },
+  {
+    id: "calendar-p4-fractions-check",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    title: "Fractions Quick Check",
+    type: "assessment_window",
+    status: "upcoming",
+    visibility: "class",
+    priority: "important",
+    startDate: "2026-07-16",
+    endDate: "2026-07-16",
+    location: "Room 4B",
+    description: "Class-linked check for equivalent fractions after the morning lesson block.",
+    requiredAction: "Resolve the blocked visual support item before administering the check.",
+    linkedTimetableEventId: "timetable-p4-quick-check",
+    linkedAssessmentId: "assessment-p4-fractions",
+  },
+  {
+    id: "calendar-ca-window",
+    workspaceId: "school-truth",
+    title: "Second CA Window Opens",
+    type: "assessment_window",
+    status: "upcoming",
+    visibility: "workspace",
+    priority: "urgent",
+    startDate: "2026-07-20",
+    endDate: "2026-07-24",
+    description: "Continuous assessment window for reviewed drafts and class-ready papers.",
+    requiredAction: "Submit remaining assessment drafts for review before Monday morning.",
+  },
+  {
+    id: "calendar-parent-consultation",
+    workspaceId: "school-truth",
+    title: "Parent Consultation Day",
+    type: "school_event",
+    status: "upcoming",
+    visibility: "workspace",
+    priority: "important",
+    startDate: "2026-07-24",
+    endDate: "2026-07-24",
+    location: "School Hall",
+    description: "Guardian consultation window focused on learner progress and support plans.",
+    requiredAction: "Prepare performance summaries for focus learners before the consultation.",
+  },
+  {
+    id: "calendar-report-deadline",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    title: "Report Draft Deadline",
+    type: "reporting",
+    status: "at_risk",
+    visibility: "class",
+    priority: "urgent",
+    startDate: "2026-08-07",
+    endDate: "2026-08-07",
+    description: "Class report comments and scores must be ready for reviewer checks.",
+    requiredAction: "Close missing score and comment gaps by 4:00 PM.",
+    linkedReportClassId: "class-p4-math",
+  },
+  {
+    id: "calendar-p5-practical-review",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    title: "Science Practical Review",
+    type: "assessment_window",
+    status: "upcoming",
+    visibility: "class",
+    priority: "normal",
+    startDate: "2026-07-22",
+    endDate: "2026-07-22",
+    location: "Lab 1",
+    description: "Admin-owned science milestone used for class-scope checks.",
+    requiredAction: "Verify practical materials and marksheet readiness.",
+    linkedAssessmentId: "assessment-p5-matter",
+  },
+  {
+    id: "calendar-river-open-day",
+    workspaceId: "school-river",
+    title: "River Gate Open Day",
+    type: "school_event",
+    status: "upcoming",
+    visibility: "workspace",
+    priority: "important",
+    startDate: "2026-07-18",
+    endDate: "2026-07-18",
+    location: "Main Quad",
+    description: "Tenant isolation fixture for academic calendar scope checks.",
+    requiredAction: "Prepare learner showcase stations.",
+  },
+];
+
 export const demoGradebookScores: DemoGradebookScore[] = [
   {
     id: "score-p4-fractions-ada",
@@ -1422,6 +1576,10 @@ export function getQuestion(questionId: string) {
 
 export function getTimetableEvent(eventId: string) {
   return demoTimetableEvents.find((event) => event.id === eventId) ?? null;
+}
+
+export function getAcademicCalendarEvent(eventId: string) {
+  return demoAcademicCalendarEvents.find((event) => event.id === eventId) ?? null;
 }
 
 export function upsertDemoAttendanceRecords(

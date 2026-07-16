@@ -127,6 +127,8 @@ First-slice API routes:
 - `/api/v1/questions/[questionId]`
 - `/api/v1/teacher/timetable`
 - `/api/v1/timetable/events/[eventId]`
+- `/api/v1/teacher/academic-calendar`
+- `/api/v1/academic-calendar/events/[eventId]`
 - `/api/v1/teacher/gradebooks`
 - `/api/v1/gradebooks/[assessmentId]`
 - `/api/v1/teacher/reports`
@@ -148,6 +150,7 @@ The current repo contains a scaffolded subset of the larger Stitch design:
 - Assessments, New Assessment, and Assessment Detail demo slice.
 - Question Bank, New Question, and Question Detail demo slice.
 - Timetable and Timetable Event demo slice.
+- Academic Calendar and Calendar Event demo slice.
 - Gradebook and Gradebook Sheet demo slice.
 - Reports and Class Report demo slice.
 - Approvals and Approval Detail demo slice.
@@ -156,7 +159,7 @@ The broader 88-screen Stitch design is not present as discrete source files in t
 
 ## 7. Existing API Calls
 
-No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class, attendance, lesson-planner, assessment, question-bank, timetable, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
+No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class, attendance, lesson-planner, assessment, question-bank, timetable, academic-calendar, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`, `src/lib/server/academic-calendar-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
 
 ## 8. Existing Mock Services and Mock Data
 
@@ -213,7 +216,7 @@ No database models, migrations, seed files, or schema tooling are present.
 
 ## 14. Existing Tests
 
-`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, attendance register filtering and save, lesson plan filtering and create, assessment filtering and create, question bank filtering and create, timetable filtering and detail access, gradebook filtering and score save, report filtering and comment save, approval filtering and reviewer decisions, admin access, `403` for same-tenant unassigned access, and `404` for cross-tenant access.
+`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, attendance register filtering and save, lesson plan filtering and create, assessment filtering and create, question bank filtering and create, timetable filtering and detail access, academic calendar filtering and detail access, gradebook filtering and score save, report filtering and comment save, approval filtering and reviewer decisions, admin access, `403` for same-tenant unassigned access, and `404` for cross-tenant access.
 
 ## 15. Existing Deployment Configuration
 

@@ -604,6 +604,84 @@ test("admin membership can view all timetable events in the active workspace", a
   assert.equal(scienceEvent.body.data.title, "Evaporation Practical Setup");
 });
 
+test("academic calendar slice scopes teacher milestones", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/academic-calendar`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const calendar = await getJson(
+    "/api/v1/teacher/academic-calendar?from=2026-07-16",
+    teacherCookie,
+  );
+  const eventIds = calendar.events.map((event) => event.id);
+
+  assert.ok(eventIds.includes("calendar-first-term"));
+  assert.ok(eventIds.includes("calendar-p4-fractions-check"));
+  assert.ok(eventIds.includes("calendar-report-deadline"));
+  assert.ok(eventIds.includes("calendar-teacher-pacing"));
+  assert.ok(!eventIds.includes("calendar-p5-practical-review"));
+
+  const assignedEvent = await fetchJson(
+    "/api/v1/academic-calendar/events/calendar-p4-fractions-check",
+    teacherCookie,
+  );
+  assert.equal(assignedEvent.response.status, 200);
+  assert.equal(assignedEvent.body.data.title, "Fractions Quick Check");
+  assert.equal(
+    assignedEvent.body.data.timetableHref,
+    "/timetable/timetable-p4-quick-check",
+  );
+  assert.equal(assignedEvent.body.data.assessmentHref, "/assessments/assessment-p4-fractions");
+
+  const unassignedEvent = await fetchJson(
+    "/api/v1/academic-calendar/events/calendar-p5-practical-review",
+    teacherCookie,
+  );
+  assert.equal(unassignedEvent.response.status, 403);
+
+  const crossTenantEvent = await fetchJson(
+    "/api/v1/academic-calendar/events/calendar-river-open-day",
+    teacherCookie,
+  );
+  assert.equal(crossTenantEvent.response.status, 404);
+
+  const invalidDate = await fetchJson(
+    "/api/v1/teacher/academic-calendar?from=July-16",
+    teacherCookie,
+  );
+  assert.equal(invalidDate.response.status, 400);
+
+  const calendarPage = await fetch(`${baseUrl}/academic-calendar`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(calendarPage.status, 200);
+  assert.match(await calendarPage.text(), /Fractions Quick Check/);
+
+  const detailPage = await fetch(
+    `${baseUrl}/academic-calendar/calendar-p4-fractions-check`,
+    {
+      headers: { cookie: teacherCookie },
+    },
+  );
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Required Action/);
+});
+
+test("admin membership can view all academic calendar events in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const calendar = await getJson("/api/v1/teacher/academic-calendar", adminCookie);
+  const eventIds = calendar.events.map((event) => event.id);
+
+  assert.ok(eventIds.includes("calendar-p5-practical-review"));
+
+  const scienceEvent = await fetchJson(
+    "/api/v1/academic-calendar/events/calendar-p5-practical-review",
+    adminCookie,
+  );
+  assert.equal(scienceEvent.response.status, 200);
+  assert.equal(scienceEvent.body.data.title, "Science Practical Review");
+});
+
 test("gradebook slice records scores with the same tenant and assignment rules", async () => {
   const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/gradebooks`);
   assert.equal(unauthenticated.status, 401);

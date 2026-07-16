@@ -72,6 +72,7 @@ Preferred production approach:
 - `class.manage`
 - `learner.view`
 - `timetable.view`
+- `calendar.view`
 - `attendance.record`
 - `attendance.view_reports`
 - `lesson.view`

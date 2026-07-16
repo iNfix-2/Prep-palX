@@ -27,6 +27,9 @@ fixtures in `src/lib/server/demo-store.ts`.
 - Timetable events cover teacher-owned workspace events, assigned class lessons,
   linked assessments, same-tenant admin-owned class events, and a cross-tenant
   event fixture.
+- Academic calendar events cover active term windows, teacher-owned planning
+  notes, assigned class milestones, same-tenant admin-owned class events, and a
+  cross-tenant event fixture.
 - Gradebook scores cover partial assigned sheets, same-tenant admin sheets, missing
   scores, and a cross-tenant score fixture.
 - Report comments cover ready and draft learner comments for assigned classes,
