@@ -8,14 +8,14 @@ Confirmed source routes in this repository:
 
 | Category | Count | Notes |
 | --- | ---: | --- |
-| UI routes implemented | 22 | Includes dynamic section routes, Ask Pal, login, My Classes, Class Overview, Attendance, and Attendance Register. |
+| UI routes implemented | 23 | Includes dynamic section routes, Ask Pal, login, My Classes, Class Overview, Attendance, Attendance Register, and Lesson Plan Detail. |
 | Mock API routes | 5 | JSON route handlers under `src/app/api`. |
-| Integrated demo slices | 4 | `/classes`, `/classes/[classId]`, `/attendance`, and `/attendance/[classId]` use auth, tenant, permission, service, DTO, and adapter layers backed by in-memory seed data. |
-| Partially integrated | 12 | Prototype API handlers plus `/api/v1` demo-backed handlers. |
-| Mock-only | 15 | Remaining teacher workspace screens depend on mock data/config. |
+| Integrated demo slices | 7 | `/classes`, `/classes/[classId]`, `/attendance`, `/attendance/[classId]`, `/lesson-planner`, `/lesson-planner/new`, and `/lesson-planner/[lessonPlanId]` use auth, tenant, permission, service, DTO, and adapter layers backed by in-memory seed data. |
+| Partially integrated | 15 | Prototype API handlers plus `/api/v1` demo-backed handlers. |
+| Mock-only | 13 | Remaining teacher workspace screens depend on mock data/config. |
 | Duplicate or experimental in repo | 0 | Duplicate dashboard variants exist in Stitch reference, not repo source. |
-| Blocked by missing requirements | 15 | Validation, persistence, production auth, and domain-specific services. |
-| Blocked by missing backend capabilities | 22 | Database, migrations, durable sessions, audit, and production authorization storage. |
+| Blocked by missing requirements | 13 | Validation, persistence, production auth, and domain-specific services. |
+| Blocked by missing backend capabilities | 23 | Database, migrations, durable sessions, audit, and production authorization storage. |
 
 ## Canonicalization Notes
 
@@ -31,8 +31,9 @@ Confirmed source routes in this repository:
 | Teacher Dashboard | `/` | Teaching operations | Teacher | Implemented mock UI | Desktop and mobile layout support | `src/lib/dashboard-data.ts` | No | schedule, urgent tasks, curriculum progress, recent docs | create assessment, Ask Pal, open lesson placeholder | No | `dashboard.view` proposed | Ask Pal, lesson planner, assessments | Canonical current repo dashboard | loading, empty, error, unauthorized, forbidden | Low |
 | My Classes | `/classes` | Classes | Teacher | First-slice integrated UI | Responsive through shell and custom cards | `src/lib/server/demo-store.ts` | Server service; `/api/v1/teacher/classes` available | assigned classes, readiness, learner counts, support flags, open tasks | prepare lesson, Ask Pal, open class | No | `class.view_assigned` or `class.manage` | Class Overview, attendance, gradebook | Canonical first slice | Implemented | High for demo, medium for production |
 | Class Overview | `/classes/[classId]` | Classes | Teacher/Admin | First-slice integrated UI | Responsive custom overview | `src/lib/server/demo-store.ts` | Server service; `/api/v1/classes/{classId}` available | class summary, next lesson, roster, tasks, recent activity | prepare lesson, Ask Pal, back to classes | No | assigned class or `class.manage` | My Classes, Lesson Planner | Canonical first slice | Implemented | High for demo, medium for production |
-| Lesson Planner | `/lesson-planner` | Teaching operations | Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | lesson queue, templates | new lesson, generate with Pal | No | `lesson.view` / `lesson.manage` | Builder, Ask Pal | Canonical placeholder | all async states | Low |
-| New Lesson Plan | `/lesson-planner/new` | Teaching operations | Teacher | Builder mock UI | Responsive | `workspace-data.ts` | No | default lesson fields and outline | save draft placeholder, Draft with Pal | Yes, static uncontrolled | `lesson.create` | Lesson Planner, Ask Pal | Canonical placeholder | validation, submission, unsaved changes, errors | Low |
+| Lesson Planner | `/lesson-planner` | Teaching operations | Teacher/Admin | Integrated demo UI | Responsive custom cards | `src/lib/server/demo-store.ts` | Server service; `/api/v1/teacher/lesson-plans` available | lesson plans, statuses, readiness, schedule | new lesson, Draft with Pal, open plan | No | `lesson.view` or `lesson.create` | Lesson Detail, New Lesson Plan, Ask Pal | Canonical lesson list | Implemented | High for demo, medium for production |
+| New Lesson Plan | `/lesson-planner/new` | Teaching operations | Teacher | Integrated demo UI | Responsive server action form | `src/lib/server/demo-store.ts` | Server action; `/api/v1/lesson-plans` available | assigned class options and draft lesson fields | save draft, back | Yes, server action form | `lesson.create` scoped to assigned class or `class.manage` | Lesson Planner, Ask Pal | Canonical lesson draft form | Implemented | High for demo, medium for production |
+| Lesson Plan Detail | `/lesson-planner/[lessonPlanId]` | Teaching operations | Teacher/Admin | Integrated demo UI | Responsive custom detail | `src/lib/server/demo-store.ts` | Server service; `/api/v1/lesson-plans/{lessonPlanId}` available | objectives, activities, materials, assessment, differentiation | back, refine with Pal | No | `lesson.view` or `lesson.create` scoped to assigned class or `class.manage` | Lesson Planner, Ask Pal | Canonical lesson detail | Implemented | High for demo, medium for production |
 | Assessments | `/assessments` | Assessment | Teacher/Reviewer | Generic workspace screen | Responsive | `workspace-data.ts` | No | assessment pipeline and moderation tasks | new assessment, question bank | No | `assessment.create` / `assessment.view` | Question Bank, Approvals | Canonical placeholder | all async states | Low |
 | New Assessment | `/assessments/new` | Assessment | Teacher | Builder mock UI | Responsive | `workspace-data.ts` | No | default assessment fields and structure | save draft placeholder, Draft with Pal | Yes, static uncontrolled | `assessment.create` | Assessments, Question Bank | Canonical placeholder | validation, submission, errors | Low |
 | Question Bank | `/question-bank` | Assessment | Teacher/Reviewer | Generic workspace screen | Responsive | `workspace-data.ts` | No | question stats and quality checks | add question placeholder, generate questions | No | `question.view` / `question.manage` | Assessments | Canonical placeholder | all async states | Low |
@@ -67,6 +68,9 @@ Confirmed source routes in this repository:
 | `/api/v1/classes/[classId]` | `src/app/api/v1/classes/[classId]/route.ts` | Demo integrated | Class overview with assigned-class, admin, and tenant checks. |
 | `/api/v1/teacher/attendance` | `src/app/api/v1/teacher/attendance/route.ts` | Demo integrated | Tenant-scoped attendance register list with permission filtering. |
 | `/api/v1/classes/[classId]/attendance` | `src/app/api/v1/classes/[classId]/attendance/route.ts` | Demo integrated | Class attendance register read/save with assigned-class, admin, and tenant checks. |
+| `/api/v1/teacher/lesson-plans` | `src/app/api/v1/teacher/lesson-plans/route.ts` | Demo integrated | Tenant-scoped lesson plan list with permission filtering. |
+| `/api/v1/lesson-plans` | `src/app/api/v1/lesson-plans/route.ts` | Demo integrated | Creates lesson plan drafts for accessible classes. |
+| `/api/v1/lesson-plans/[lessonPlanId]` | `src/app/api/v1/lesson-plans/[lessonPlanId]/route.ts` | Demo integrated | Lesson plan detail with assigned-class, admin, and tenant checks. |
 
 ## Deprecated-Screen Candidates
 

@@ -60,6 +60,29 @@ export interface DemoAttendanceRecord {
   updatedAt: string;
 }
 
+export type DemoLessonPlanStatus = "draft" | "in_review" | "approved";
+
+export interface DemoLessonPlan {
+  id: string;
+  workspaceId: string;
+  classId: string;
+  title: string;
+  topic: string;
+  status: DemoLessonPlanStatus;
+  scheduledFor: string;
+  durationMinutes: number;
+  objectives: string[];
+  materials: string[];
+  starterActivity: string;
+  teachingActivity: string;
+  learnerPractice: string;
+  assessmentCheck: string;
+  differentiation: string;
+  readinessPercent: number;
+  createdByMembershipId: string;
+  updatedAt: string;
+}
+
 export interface DemoClassTask {
   id: string;
   title: string;
@@ -154,6 +177,7 @@ export const demoMemberships: DemoMembership[] = [
       "class.view_assigned",
       "attendance.record",
       "attendance.view_reports",
+      "lesson.view",
       "lesson.create",
       "assessment.create",
       "ai.use",
@@ -173,6 +197,7 @@ export const demoMemberships: DemoMembership[] = [
       "class.manage",
       "attendance.record",
       "attendance.view_reports",
+      "lesson.view",
       "lesson.create",
       "assessment.create",
       "ai.use",
@@ -190,6 +215,7 @@ export const demoMemberships: DemoMembership[] = [
       "workspace.select",
       "class.view_assigned",
       "attendance.record",
+      "lesson.view",
       "lesson.create",
     ],
   },
@@ -477,6 +503,113 @@ export const demoAttendanceRecords: DemoAttendanceRecord[] = [
   },
 ];
 
+export const demoLessonPlans: DemoLessonPlan[] = [
+  {
+    id: "lesson-p4-fractions",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    title: "Equivalent Fractions",
+    topic: "Representing equivalent fractions with visual models",
+    status: "draft",
+    scheduledFor: "2026-07-17",
+    durationMinutes: 40,
+    objectives: [
+      "Identify equivalent fractions using fraction strips.",
+      "Explain why two fractions can represent the same amount.",
+    ],
+    materials: ["Fraction strips", "Mini whiteboards", "Exit ticket"],
+    starterActivity:
+      "Learners match shaded fraction cards and explain one match to a partner.",
+    teachingActivity:
+      "Model equivalent fractions with strips, then compare one-half, two-quarters, and three-sixths.",
+    learnerPractice:
+      "Pairs build three equivalent fractions and record the relationship in their notebooks.",
+    assessmentCheck:
+      "Exit ticket: draw a visual model that proves 2/4 is equivalent to 1/2.",
+    differentiation:
+      "Support group uses pre-cut strips; extension group writes one general rule.",
+    readinessPercent: 72,
+    createdByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T10:15:00.000Z",
+  },
+  {
+    id: "lesson-p3-reading",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    title: "Main Idea in Short Passages",
+    topic: "Finding evidence for the main idea",
+    status: "in_review",
+    scheduledFor: "2026-07-18",
+    durationMinutes: 35,
+    objectives: [
+      "State the main idea of a short passage.",
+      "Underline one sentence that supports the main idea.",
+    ],
+    materials: ["Term reader", "Highlighters", "Comprehension worksheet"],
+    starterActivity:
+      "Read a three-sentence paragraph and choose the best title.",
+    teachingActivity:
+      "Think aloud while separating interesting details from the central idea.",
+    learnerPractice:
+      "Small groups annotate one passage and share their evidence.",
+    assessmentCheck:
+      "Collect one-sentence main idea responses before plenary.",
+    differentiation:
+      "Provide sentence frames for support group and an unseen passage for extension.",
+    readinessPercent: 84,
+    createdByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T11:00:00.000Z",
+  },
+  {
+    id: "lesson-p5-evaporation",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    title: "Evaporation Practical",
+    topic: "Observing changes of state safely",
+    status: "approved",
+    scheduledFor: "2026-07-20",
+    durationMinutes: 45,
+    objectives: [
+      "Describe evaporation as a change from liquid to gas.",
+      "Record observations from a safe practical activity.",
+    ],
+    materials: ["Water trays", "Heat source", "Safety checklist"],
+    starterActivity:
+      "Learners predict what will happen to water left in the sun.",
+    teachingActivity:
+      "Demonstrate the practical setup and reinforce safety expectations.",
+    learnerPractice:
+      "Groups observe, record, and compare water levels after heating.",
+    assessmentCheck:
+      "Learners write one observation and one conclusion.",
+    differentiation:
+      "Provide observation prompts for support learners.",
+    readinessPercent: 100,
+    createdByMembershipId: "mem-truth-admin",
+    updatedAt: "2026-07-15T13:30:00.000Z",
+  },
+  {
+    id: "lesson-river-community",
+    workspaceId: "school-river",
+    classId: "class-river-history",
+    title: "Community Helpers",
+    topic: "Roles and responsibilities in the community",
+    status: "draft",
+    scheduledFor: "2026-07-18",
+    durationMinutes: 30,
+    objectives: ["Name three community helpers.", "Explain how one helper supports families."],
+    materials: ["Picture cards", "Role-play prompts"],
+    starterActivity: "Learners identify helper pictures.",
+    teachingActivity: "Discuss helper roles with picture prompts.",
+    learnerPractice: "Learners role-play a community helper.",
+    assessmentCheck: "Learners complete one helper sentence.",
+    differentiation: "Use picture prompts for emerging readers.",
+    readinessPercent: 68,
+    createdByMembershipId: "mem-river-teacher",
+    updatedAt: "2026-07-16T09:00:00.000Z",
+  },
+];
+
 export function findDemoUserBySession(token: string | undefined) {
   const session = demoSessions.find((item) => item.token === token);
   return session ? demoUsers.find((user) => user.id === session.userId) ?? null : null;
@@ -568,4 +701,43 @@ export function upsertDemoAttendanceRecords(
       updatedAt,
     });
   }
+}
+
+export function createDemoLessonPlan(
+  input: Omit<DemoLessonPlan, "id" | "updatedAt" | "readinessPercent" | "status"> & {
+    status?: DemoLessonPlanStatus;
+    readinessPercent?: number;
+  },
+) {
+  const lessonPlan: DemoLessonPlan = {
+    ...input,
+    id: `lesson-plan-${demoLessonPlans.length + 1}`,
+    status: input.status ?? "draft",
+    readinessPercent: input.readinessPercent ?? calculateLessonReadiness(input),
+    updatedAt: new Date().toISOString(),
+  };
+
+  demoLessonPlans.push(lessonPlan);
+  return lessonPlan;
+}
+
+function calculateLessonReadiness(input: {
+  objectives: string[];
+  materials: string[];
+  starterActivity: string;
+  teachingActivity: string;
+  learnerPractice: string;
+  assessmentCheck: string;
+  differentiation: string;
+}) {
+  const checks = [
+    input.objectives.length > 0,
+    input.materials.length > 0,
+    input.starterActivity.length > 0,
+    input.teachingActivity.length > 0,
+    input.learnerPractice.length > 0,
+    input.assessmentCheck.length > 0,
+    input.differentiation.length > 0,
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }

@@ -18,6 +18,8 @@ fixtures in `src/lib/server/demo-store.ts`.
 - `class-river-history`: different tenant; must return `404` from the Truth workspace.
 - Attendance records for `2026-07-16` cover marked, partial, same-tenant
   unassigned, and cross-tenant register scenarios.
+- Lesson plans cover assigned teacher drafts, in-review plans, same-tenant admin
+  plans, and a cross-tenant plan.
 
 Required seed scenarios:
 

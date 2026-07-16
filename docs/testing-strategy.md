@@ -37,6 +37,11 @@ Implemented coverage:
 - Invalid attendance learner IDs return `400`.
 - Attendance follows the same same-tenant `403` and cross-tenant `404` rules.
 - Admin membership can view attendance for all classes in the active tenant.
+- Unauthenticated `/api/v1/teacher/lesson-plans` returns `401`.
+- Teacher lesson plans are filtered to assigned classes.
+- Lesson plan detail follows same-tenant `403` and cross-tenant `404` rules.
+- Lesson plan creation validates required fields and assigned-class scope.
+- Admin membership can view all lesson plans in the active tenant.
 
 Cover:
 
@@ -67,6 +72,9 @@ Initial critical path is partially covered by the integration test:
 4. Class Overview.
 5. Attendance.
 6. Attendance Register.
+7. Lesson Planner.
+8. New Lesson Plan.
+9. Lesson Plan Detail.
 
 Future paths:
 

@@ -180,6 +180,123 @@ test("admin membership can record attendance for all classes in the active works
   assert.equal(scienceRegister.status, "complete");
 });
 
+test("lesson planner slice creates and scopes lesson plans", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/lesson-plans`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const plans = await getJson("/api/v1/teacher/lesson-plans", teacherCookie);
+  const planIds = plans.lessonPlans.map((lessonPlan) => lessonPlan.id);
+  assert.deepEqual(planIds, ["lesson-p4-fractions", "lesson-p3-reading"]);
+
+  const assignedPlan = await fetchJson(
+    "/api/v1/lesson-plans/lesson-p4-fractions",
+    teacherCookie,
+  );
+  assert.equal(assignedPlan.response.status, 200);
+  assert.equal(assignedPlan.body.data.title, "Equivalent Fractions");
+
+  const unassignedPlan = await fetchJson(
+    "/api/v1/lesson-plans/lesson-p5-evaporation",
+    teacherCookie,
+  );
+  assert.equal(unassignedPlan.response.status, 403);
+
+  const crossTenantPlan = await fetchJson(
+    "/api/v1/lesson-plans/lesson-river-community",
+    teacherCookie,
+  );
+  assert.equal(crossTenantPlan.response.status, 404);
+
+  const invalidDraft = await postJson("/api/v1/lesson-plans", teacherCookie, {
+    classId: "class-p3-english",
+    title: "",
+    topic: "Prediction and evidence",
+    scheduledFor: "2026-07-22",
+    durationMinutes: 40,
+    objectives: [],
+    materials: ["Reader"],
+    starterActivity: "Prompt",
+    teachingActivity: "Model",
+    learnerPractice: "Practice",
+    assessmentCheck: "Exit ticket",
+    differentiation: "Support prompts",
+  });
+  assert.equal(invalidDraft.response.status, 400);
+
+  const unassignedDraft = await postJson("/api/v1/lesson-plans", teacherCookie, {
+    classId: "class-p5-science",
+    title: "Unassigned Science Draft",
+    topic: "Changes of state",
+    scheduledFor: "2026-07-22",
+    durationMinutes: 40,
+    objectives: ["Describe one change of state"],
+    materials: ["Tray"],
+    starterActivity: "Prediction",
+    teachingActivity: "Demonstration",
+    learnerPractice: "Observation notes",
+    assessmentCheck: "Exit ticket",
+    differentiation: "Prompt cards",
+  });
+  assert.equal(unassignedDraft.response.status, 403);
+
+  const created = await postJson("/api/v1/lesson-plans", teacherCookie, {
+    classId: "class-p3-english",
+    title: "Prediction and Evidence",
+    topic: "Using clues before reading",
+    scheduledFor: "2026-07-22",
+    durationMinutes: 40,
+    objectives: ["Make a prediction from the title", "Support a prediction with one clue"],
+    materials: ["Reader", "Prediction chart"],
+    starterActivity: "Learners predict from a covered image.",
+    teachingActivity: "Model how to find clues in the title and first paragraph.",
+    learnerPractice: "Pairs complete prediction charts.",
+    assessmentCheck: "Learners explain whether their prediction changed.",
+    differentiation: "Provide sentence starters for support learners.",
+  });
+  assert.equal(created.response.status, 201);
+  assert.equal(created.body.data.title, "Prediction and Evidence");
+
+  const createdDetail = await getJson(
+    `/api/v1/lesson-plans/${created.body.data.id}`,
+    teacherCookie,
+  );
+  assert.equal(createdDetail.topic, "Using clues before reading");
+
+  const plannerPage = await fetch(`${baseUrl}/lesson-planner`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(plannerPage.status, 200);
+  assert.match(await plannerPage.text(), /Equivalent Fractions/);
+
+  const newPlanPage = await fetch(`${baseUrl}/lesson-planner/new?classId=class-p3-english`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(newPlanPage.status, 200);
+  assert.match(await newPlanPage.text(), /New Lesson Plan/);
+
+  const detailPage = await fetch(`${baseUrl}/lesson-planner/lesson-p4-fractions`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Learning Objectives/);
+});
+
+test("admin membership can view all lesson plans in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const plans = await getJson("/api/v1/teacher/lesson-plans", adminCookie);
+  const planIds = plans.lessonPlans.map((lessonPlan) => lessonPlan.id);
+
+  assert.ok(planIds.includes("lesson-p5-evaporation"));
+
+  const sciencePlan = await fetchJson(
+    "/api/v1/lesson-plans/lesson-p5-evaporation",
+    adminCookie,
+  );
+  assert.equal(sciencePlan.response.status, 200);
+  assert.equal(sciencePlan.body.data.title, "Evaporation Practical");
+});
+
 async function login(email, password) {
   const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: "POST",

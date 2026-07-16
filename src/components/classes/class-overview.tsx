@@ -44,7 +44,7 @@ export function ClassOverview({ view }: { view: ClassOverviewView }) {
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
-            href="/lesson-planner/new"
+            href={`/lesson-planner/new?classId=${view.id}`}
             className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-body-md font-semibold text-on-primary transition-colors hover:bg-primary-hover"
           >
             <Icon name="auto_stories" className="text-[18px]" />

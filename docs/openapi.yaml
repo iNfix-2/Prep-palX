@@ -166,6 +166,89 @@ components:
                 $ref: "#/components/schemas/AttendanceStatus"
               note:
                 type: string
+    LessonPlanStatus:
+      type: string
+      enum: [draft, in_review, approved]
+    LessonPlanListItem:
+      type: object
+      required: [id, classId, title, topic, status, scheduledFor, durationMinutes]
+      properties:
+        id:
+          type: string
+        classId:
+          type: string
+        classDisplayName:
+          type: string
+        title:
+          type: string
+        topic:
+          type: string
+        status:
+          $ref: "#/components/schemas/LessonPlanStatus"
+        scheduledFor:
+          type: string
+          format: date
+        durationMinutes:
+          type: integer
+        readinessPercent:
+          type: integer
+    LessonPlanDetail:
+      allOf:
+        - $ref: "#/components/schemas/LessonPlanListItem"
+        - type: object
+          required: [objectives, materials, starterActivity, teachingActivity, learnerPractice, assessmentCheck, differentiation]
+          properties:
+            objectives:
+              type: array
+              items:
+                type: string
+            materials:
+              type: array
+              items:
+                type: string
+            starterActivity:
+              type: string
+            teachingActivity:
+              type: string
+            learnerPractice:
+              type: string
+            assessmentCheck:
+              type: string
+            differentiation:
+              type: string
+    CreateLessonPlanRequest:
+      type: object
+      required: [classId, title, topic, scheduledFor, durationMinutes, objectives, teachingActivity, learnerPractice, assessmentCheck]
+      properties:
+        classId:
+          type: string
+        title:
+          type: string
+        topic:
+          type: string
+        scheduledFor:
+          type: string
+          format: date
+        durationMinutes:
+          type: integer
+        objectives:
+          type: array
+          items:
+            type: string
+        materials:
+          type: array
+          items:
+            type: string
+        starterActivity:
+          type: string
+        teachingActivity:
+          type: string
+        learnerPractice:
+          type: string
+        assessmentCheck:
+          type: string
+        differentiation:
+          type: string
 paths:
   /auth/login:
     post:
@@ -247,6 +330,34 @@ paths:
           description: Unauthenticated.
         "403":
           description: Missing attendance permission.
+  /teacher/lesson-plans:
+    get:
+      summary: List lesson plans for accessible classes.
+      responses:
+        "200":
+          description: Lesson plan summaries.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing lesson permission.
+  /lesson-plans:
+    post:
+      summary: Create a lesson plan draft for an accessible class.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLessonPlanRequest"
+      responses:
+        "201":
+          description: Created lesson plan.
+        "400":
+          description: Invalid lesson plan draft.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Class is outside permitted scope or missing lesson permission.
   /classes/{classId}:
     get:
       summary: Get class overview if the user has access.
@@ -265,6 +376,24 @@ paths:
           description: Class is outside permitted scope.
         "404":
           description: Class not found in active tenant.
+  /lesson-plans/{lessonPlanId}:
+    get:
+      summary: Get lesson plan detail if the user has access.
+      parameters:
+        - in: path
+          name: lessonPlanId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lesson plan detail.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Lesson plan is outside permitted class scope.
+        "404":
+          description: Lesson plan not found in active tenant.
   /classes/{classId}/attendance:
     get:
       summary: Get attendance register for an accessible class.

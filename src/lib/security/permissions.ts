@@ -5,6 +5,7 @@ export const permissions = [
   "class.manage",
   "attendance.record",
   "attendance.view_reports",
+  "lesson.view",
   "lesson.create",
   "assessment.create",
   "ai.use",
