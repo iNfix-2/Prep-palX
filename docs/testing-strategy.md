@@ -52,6 +52,11 @@ Implemented coverage:
 - Gradebook sheet detail follows same-tenant `403` and cross-tenant `404` rules.
 - Gradebook score save validates learner IDs, score ranges, and assigned-class scope.
 - Admin membership can view all gradebook sheets in the active tenant.
+- Unauthenticated `/api/v1/teacher/reports` returns `401`.
+- Teacher report readiness is filtered to assigned classes.
+- Class report detail follows same-tenant `403` and cross-tenant `404` rules.
+- Report comment save validates learner IDs, ready comments, and assigned-class scope.
+- Admin membership can view all reports in the active tenant.
 
 Cover:
 
@@ -90,10 +95,12 @@ Initial critical path is partially covered by the integration test:
 12. Assessment Detail.
 13. Gradebook.
 14. Gradebook Sheet.
+15. Reports.
+16. Class Report.
 
 Future paths:
 
-- Report review and publication.
+- Report template review and publication.
 
 ## Security Tests
 

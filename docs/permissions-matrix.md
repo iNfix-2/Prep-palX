@@ -31,7 +31,8 @@ This matrix is the initial permission model. It must be enforced server-side bef
 | `/gradebook/[assessmentId]` | `assessment.mark` or `gradebook.view` scoped to assigned class or `class.manage` |
 | `/attendance` | `attendance.record` or `attendance.view_reports` |
 | `/attendance/[classId]` | `attendance.record` scoped to assigned class or `class.manage` |
-| `/reports` | `report.prepare` |
+| `/reports` | `report.prepare` or `report.review` |
+| `/reports/[classId]` | `report.prepare` or `report.review` scoped to assigned class or `class.manage` |
 | `/approvals` | `assessment.moderate` or `report.review` |
 | `/ask-pal` | `ai.use` |
 | `/settings` | `account.manage_self` |

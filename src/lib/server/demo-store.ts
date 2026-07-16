@@ -129,6 +129,21 @@ export interface DemoGradebookScore {
   updatedAt: string;
 }
 
+export type DemoReportCommentStatus = "draft" | "ready";
+
+export interface DemoReportComment {
+  id: string;
+  workspaceId: string;
+  classId: string;
+  learnerId: string;
+  academicYearId: string;
+  termId: string;
+  comment: string;
+  status: DemoReportCommentStatus;
+  updatedByMembershipId: string;
+  updatedAt: string;
+}
+
 export interface DemoClassTask {
   id: string;
   title: string;
@@ -229,6 +244,7 @@ export const demoMemberships: DemoMembership[] = [
       "assessment.create",
       "assessment.mark",
       "gradebook.view",
+      "report.prepare",
       "ai.use",
     ],
   },
@@ -252,6 +268,8 @@ export const demoMemberships: DemoMembership[] = [
       "assessment.create",
       "assessment.mark",
       "gradebook.view",
+      "report.prepare",
+      "report.review",
       "ai.use",
     ],
   },
@@ -903,6 +921,73 @@ export const demoGradebookScores: DemoGradebookScore[] = [
   },
 ];
 
+export const demoReportComments: DemoReportComment[] = [
+  {
+    id: "report-comment-p4-ada",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    learnerId: "learner-ada",
+    academicYearId: "ay-2026-2027",
+    termId: "term-1",
+    comment:
+      "Ada works confidently with visual fraction models and explains her thinking clearly.",
+    status: "ready",
+    updatedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T14:00:00.000Z",
+  },
+  {
+    id: "report-comment-p4-tomi",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    learnerId: "learner-tomi",
+    academicYearId: "ay-2026-2027",
+    termId: "term-1",
+    comment:
+      "Tomi is making steady progress and should keep practising written explanations.",
+    status: "draft",
+    updatedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T14:05:00.000Z",
+  },
+  {
+    id: "report-comment-p3-ife",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    learnerId: "learner-ife",
+    academicYearId: "ay-2026-2027",
+    termId: "term-1",
+    comment:
+      "Ife reads with growing confidence and can identify the main idea in familiar texts.",
+    status: "ready",
+    updatedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T14:20:00.000Z",
+  },
+  {
+    id: "report-comment-p5-uche",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    learnerId: "learner-uche",
+    academicYearId: "ay-2026-2027",
+    termId: "term-1",
+    comment:
+      "Uche records practical observations carefully and follows lab routines responsibly.",
+    status: "ready",
+    updatedByMembershipId: "mem-truth-admin",
+    updatedAt: "2026-07-15T16:30:00.000Z",
+  },
+  {
+    id: "report-comment-river-maryam",
+    workspaceId: "school-river",
+    classId: "class-river-history",
+    learnerId: "learner-maryam",
+    academicYearId: "ay-2026-2027",
+    termId: "term-1",
+    comment: "Tenant isolation fixture.",
+    status: "draft",
+    updatedByMembershipId: "mem-river-teacher",
+    updatedAt: "2026-07-16T12:00:00.000Z",
+  },
+];
+
 export function findDemoUserBySession(token: string | undefined) {
   const session = demoSessions.find((item) => item.token === token);
   return session ? demoUsers.find((user) => user.id === session.userId) ?? null : null;
@@ -961,6 +1046,10 @@ export function getAttendanceRecordsForClass(classId: string, date: string) {
 
 export function getGradebookScoresForAssessment(assessmentId: string) {
   return demoGradebookScores.filter((record) => record.assessmentId === assessmentId);
+}
+
+export function getReportCommentsForClass(classId: string) {
+  return demoReportComments.filter((record) => record.classId === classId);
 }
 
 export function upsertDemoAttendanceRecords(
@@ -1035,6 +1124,45 @@ export function upsertDemoGradebookScores(
     demoGradebookScores.push({
       id: `score-${record.assessmentId}-${record.learnerId}`,
       ...record,
+      updatedAt,
+    });
+  }
+}
+
+export function upsertDemoReportComments(
+  comments: Array<{
+    workspaceId: string;
+    classId: string;
+    learnerId: string;
+    academicYearId: string;
+    termId: string;
+    comment: string;
+    status: DemoReportCommentStatus;
+    updatedByMembershipId: string;
+  }>,
+) {
+  const updatedAt = new Date().toISOString();
+
+  for (const comment of comments) {
+    const existing = demoReportComments.find(
+      (candidate) =>
+        candidate.classId === comment.classId &&
+        candidate.learnerId === comment.learnerId &&
+        candidate.academicYearId === comment.academicYearId &&
+        candidate.termId === comment.termId,
+    );
+
+    if (existing) {
+      existing.comment = comment.comment;
+      existing.status = comment.status;
+      existing.updatedByMembershipId = comment.updatedByMembershipId;
+      existing.updatedAt = updatedAt;
+      continue;
+    }
+
+    demoReportComments.push({
+      id: `report-comment-${comment.classId}-${comment.learnerId}`,
+      ...comment,
       updatedAt,
     });
   }

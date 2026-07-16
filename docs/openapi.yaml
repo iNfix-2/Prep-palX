@@ -446,6 +446,98 @@ components:
                 $ref: "#/components/schemas/GradebookScoreStatus"
               feedback:
                 type: string
+    ReportReadinessStatus:
+      type: string
+      enum: [ready, needs_attention, blocked]
+    ReportCommentStatus:
+      type: string
+      enum: [draft, ready]
+    ReportClassSummary:
+      type: object
+      required: [id, classId, classDisplayName, learnerCount, readyLearnerCount, missingCommentCount, missingScoreCount, readinessPercent, status]
+      properties:
+        id:
+          type: string
+        classId:
+          type: string
+        classDisplayName:
+          type: string
+        subjectName:
+          type: string
+        gradeName:
+          type: string
+        room:
+          type: string
+        learnerCount:
+          type: integer
+        readyLearnerCount:
+          type: integer
+        commentCount:
+          type: integer
+        missingCommentCount:
+          type: integer
+        missingScoreCount:
+          type: integer
+        averageScorePercent:
+          type: integer
+        averageAttendancePercent:
+          type: integer
+        readinessPercent:
+          type: integer
+        status:
+          $ref: "#/components/schemas/ReportReadinessStatus"
+    ReportLearnerProfile:
+      type: object
+      required: [learnerId, displayName, admissionNo, averageScorePercent, missingScoreCount, attendancePercent, comment, commentStatus, isReady]
+      properties:
+        learnerId:
+          type: string
+        displayName:
+          type: string
+        admissionNo:
+          type: string
+        averageScorePercent:
+          type: integer
+        missingScoreCount:
+          type: integer
+        attendancePercent:
+          type: integer
+        comment:
+          type: string
+        commentStatus:
+          $ref: "#/components/schemas/ReportCommentStatus"
+        isReady:
+          type: boolean
+    ClassReport:
+      allOf:
+        - $ref: "#/components/schemas/ReportClassSummary"
+        - type: object
+          required: [academicSessionLabel, currentUnit, learners]
+          properties:
+            academicSessionLabel:
+              type: string
+            currentUnit:
+              type: string
+            learners:
+              type: array
+              items:
+                $ref: "#/components/schemas/ReportLearnerProfile"
+    SaveReportCommentsRequest:
+      type: object
+      required: [comments]
+      properties:
+        comments:
+          type: array
+          items:
+            type: object
+            required: [learnerId, comment, status]
+            properties:
+              learnerId:
+                type: string
+              comment:
+                type: string
+              status:
+                $ref: "#/components/schemas/ReportCommentStatus"
 paths:
   /auth/login:
     post:
@@ -557,6 +649,16 @@ paths:
           description: Unauthenticated.
         "403":
           description: Missing gradebook permission.
+  /teacher/reports:
+    get:
+      summary: List report readiness for accessible classes.
+      responses:
+        "200":
+          description: Report readiness summaries.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing report permission.
   /lesson-plans:
     post:
       summary: Create a lesson plan draft for an accessible class.
@@ -690,6 +792,49 @@ paths:
           description: Gradebook sheet is outside permitted class scope or missing mark permission.
         "404":
           description: Gradebook sheet not found in active tenant.
+  /reports/{classId}:
+    get:
+      summary: Get class report for an accessible class.
+      parameters:
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Class report detail.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Class is outside permitted scope or missing report permission.
+        "404":
+          description: Report not found in active tenant.
+    post:
+      summary: Save report comments for an accessible class.
+      parameters:
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveReportCommentsRequest"
+      responses:
+        "200":
+          description: Updated class report.
+        "400":
+          description: Invalid report comments.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Class is outside permitted scope or missing report permission.
+        "404":
+          description: Report not found in active tenant.
   /classes/{classId}/attendance:
     get:
       summary: Get attendance register for an accessible class.

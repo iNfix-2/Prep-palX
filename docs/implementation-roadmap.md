@@ -60,7 +60,11 @@ Objective: report templates, report cards, review, publishing, learner profiles.
 
 Dependencies: assessment, attendance, behaviour, permissions.
 
-Complexity: extra-large. Status: not started.
+Complexity: extra-large. Status: report readiness list, class report detail,
+and comment preparation demo slices are implemented with in-memory assessment,
+attendance, and comment evidence. Report templates, reviewer workflow,
+publishing, parent/learner delivery, behaviour evidence, and production
+persistence are not started.
 
 ## Phase F: Additional Operations
 
@@ -94,4 +98,6 @@ Complexity: extra-large. Status: not started.
 
 Replace `src/lib/server/demo-store.ts` with a real database repository layer while
 preserving the service boundaries in `src/lib/server/classes-service.ts` and
-`src/lib/server/attendance-service.ts`, and `src/lib/server/lesson-plans-service.ts`.
+`src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`,
+`src/lib/server/assessments-service.ts`, `src/lib/server/gradebook-service.ts`,
+and `src/lib/server/reports-service.ts`.

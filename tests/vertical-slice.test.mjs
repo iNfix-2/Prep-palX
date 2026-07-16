@@ -523,6 +523,97 @@ test("admin membership can view all gradebook sheets in the active workspace", a
   assert.equal(scienceSheet.body.data.assessmentTitle, "Matter and Change Practical Evidence");
 });
 
+test("reports slice prepares class comments with the same tenant and assignment rules", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/reports`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const reports = await getJson("/api/v1/teacher/reports", teacherCookie);
+  const reportIds = reports.reports.map((report) => report.classId);
+
+  assert.ok(reportIds.includes("class-p4-math"));
+  assert.ok(reportIds.includes("class-p3-english"));
+  assert.ok(!reportIds.includes("class-p5-science"));
+
+  const assignedReport = await fetchJson("/api/v1/reports/class-p4-math", teacherCookie);
+  assert.equal(assignedReport.response.status, 200);
+  assert.equal(assignedReport.body.data.classDisplayName, "Primary 4 Mathematics");
+  assert.equal(assignedReport.body.data.learners.length, 3);
+
+  const unassignedReport = await fetchJson("/api/v1/reports/class-p5-science", teacherCookie);
+  assert.equal(unassignedReport.response.status, 403);
+
+  const crossTenantReport = await fetchJson(
+    "/api/v1/reports/class-river-history",
+    teacherCookie,
+  );
+  assert.equal(crossTenantReport.response.status, 404);
+
+  const invalidComment = await postJson("/api/v1/reports/class-p4-math", teacherCookie, {
+    comments: [
+      { learnerId: "learner-uche", status: "ready", comment: "" },
+      { learnerId: "learner-kene", status: "ready", comment: "" },
+    ],
+  });
+  assert.equal(invalidComment.response.status, 400);
+
+  const malformedPayload = await postJson("/api/v1/reports/class-p4-math", teacherCookie, {
+    comments: [],
+  });
+  assert.equal(malformedPayload.response.status, 400);
+
+  const unassignedSave = await postJson("/api/v1/reports/class-p5-science", teacherCookie, {
+    comments: [
+      {
+        learnerId: "learner-uche",
+        status: "ready",
+        comment: "Uche records observations carefully.",
+      },
+    ],
+  });
+  assert.equal(unassignedSave.response.status, 403);
+
+  const saved = await postJson("/api/v1/reports/class-p3-english", teacherCookie, {
+    comments: [
+      {
+        learnerId: "learner-zara",
+        status: "ready",
+        comment: "Zara is building confidence with main idea evidence.",
+      },
+    ],
+  });
+  assert.equal(saved.response.status, 200);
+  assert.equal(
+    saved.body.data.learners.find((learner) => learner.learnerId === "learner-zara")
+      .commentStatus,
+    "ready",
+  );
+
+  const reportsPage = await fetch(`${baseUrl}/reports`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(reportsPage.status, 200);
+  assert.match(await reportsPage.text(), /Primary 4 Mathematics/);
+
+  const detailPage = await fetch(`${baseUrl}/reports/class-p4-math`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Save comments/);
+});
+
+test("admin membership can view all reports in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const reports = await getJson("/api/v1/teacher/reports", adminCookie);
+  const reportIds = reports.reports.map((report) => report.classId);
+
+  assert.ok(reportIds.includes("class-p5-science"));
+
+  const scienceReport = await fetchJson("/api/v1/reports/class-p5-science", adminCookie);
+  assert.equal(scienceReport.response.status, 200);
+  assert.equal(scienceReport.body.data.classDisplayName, "Primary 5 Basic Science");
+});
+
 async function login(email, password) {
   const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: "POST",

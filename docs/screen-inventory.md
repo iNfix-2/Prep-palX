@@ -8,11 +8,11 @@ Confirmed source routes in this repository:
 
 | Category | Count | Notes |
 | --- | ---: | --- |
-| UI routes implemented | 27 | Includes dynamic section routes, Ask Pal, login, My Classes, Class Overview, Attendance, Attendance Register, Lesson Plan Detail, Assessment Detail, and Gradebook Sheet. |
+| UI routes implemented | 28 | Includes dynamic section routes, Ask Pal, login, My Classes, Class Overview, Attendance, Attendance Register, Lesson Plan Detail, Assessment Detail, Gradebook Sheet, Reports, and Class Report. |
 | Mock API routes | 5 | JSON route handlers under `src/app/api`. |
-| Integrated demo slices | 12 | `/classes`, `/classes/[classId]`, `/attendance`, `/attendance/[classId]`, `/lesson-planner`, `/lesson-planner/new`, `/lesson-planner/[lessonPlanId]`, `/assessments`, `/assessments/new`, `/assessments/[assessmentId]`, `/gradebook`, and `/gradebook/[assessmentId]` use auth, tenant, permission, service, DTO, and adapter layers backed by in-memory seed data. |
-| Partially integrated | 20 | Prototype API handlers plus `/api/v1` demo-backed handlers. |
-| Mock-only | 10 | Remaining teacher workspace screens depend on mock data/config. |
+| Integrated demo slices | 14 | `/classes`, `/classes/[classId]`, `/attendance`, `/attendance/[classId]`, `/lesson-planner`, `/lesson-planner/new`, `/lesson-planner/[lessonPlanId]`, `/assessments`, `/assessments/new`, `/assessments/[assessmentId]`, `/gradebook`, `/gradebook/[assessmentId]`, `/reports`, and `/reports/[classId]` use auth, tenant, permission, service, DTO, and adapter layers backed by in-memory seed data. |
+| Partially integrated | 22 | Prototype API handlers plus `/api/v1` demo-backed handlers. |
+| Mock-only | 9 | Remaining teacher workspace screens depend on mock data/config. |
 | Duplicate or experimental in repo | 0 | Duplicate dashboard variants exist in Stitch reference, not repo source. |
 | Blocked by missing requirements | 13 | Validation, persistence, production auth, and domain-specific services. |
 | Blocked by missing backend capabilities | 23 | Database, migrations, durable sessions, audit, and production authorization storage. |
@@ -46,7 +46,8 @@ Confirmed source routes in this repository:
 | Attendance Register | `/attendance/[classId]` | Attendance | Teacher/Admin | Integrated demo UI | Responsive register form | `src/lib/server/demo-store.ts` | Server action; `/api/v1/classes/{classId}/attendance` available | learner roster, attendance statuses, notes, register counts | save register, cancel | Yes, server action form | assigned class with `attendance.record` or `class.manage` | Attendance, Classes | Canonical attendance register | Implemented | High for demo, medium for production |
 | Resources | `/resources` | Teaching resources | Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | library resources and hygiene | upload placeholder, generate worksheet | No | `resource.view` / `resource.manage` | Lesson Planner | Canonical placeholder | all async states | Low |
 | Approvals | `/approvals` | Workflow approvals | Reviewer/Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | approval queue and reviewer activity | review queue, delegate placeholder | No | `approval.review` | Assessments, Reports | Canonical placeholder | all async states | Low |
-| Reports | `/reports` | Reporting | Teacher/Reviewer | Generic workspace screen | Responsive | `workspace-data.ts` | No | readiness, profiles, publishing checklist | generate report placeholder | No | `report.prepare` | Gradebook | Canonical placeholder | all async states | Low |
+| Reports | `/reports` | Reporting | Teacher/Reviewer | Integrated demo UI | Responsive custom cards | `src/lib/server/demo-store.ts` | Server service; `/api/v1/teacher/reports` available | class report readiness, learner counts, comments, missing scores, averages | open report, gradebook, Draft with Pal | No | `report.prepare` or `report.review` | Gradebook, Attendance, Class Report | Canonical report readiness list | Implemented | High for demo, medium for production |
+| Class Report | `/reports/[classId]` | Reporting | Teacher/Reviewer | Integrated demo UI | Responsive server action form | `src/lib/server/demo-store.ts` | Server action; `/api/v1/reports/{classId}` available | learner report comments, score averages, attendance, missing scores | save comments, back | Yes, server action form | `report.prepare` or `report.review` scoped to assigned class or `class.manage` | Reports, Gradebook, Attendance | Canonical report preparation workbench | Implemented | High for demo, medium for production |
 | My Tasks | `/my-tasks` | Workflow/tasks | Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | priority and completed tasks | add task placeholder | No | `task.view` | Dashboard | Canonical placeholder | all async states | Low |
 | Ask Pal | `/ask-pal` | AI assistant | Teacher | Full-screen mock UI | Desktop/mobile checked | `src/lib/ask-pal-data.ts` | No | conversations, quick actions, context, sources | prompt composer, review AI tasks placeholder | Prompt textarea only | `ai.use` | All modules | Canonical current repo Ask Pal | loading, error, unauthorized, action confirmation | Low until AI boundaries exist |
 | Help Centre | `/help` | Support | Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | guides and support requests | new support request placeholder | No | `support.view` | Settings | Canonical placeholder | all async states | Low |
@@ -78,6 +79,8 @@ Confirmed source routes in this repository:
 | `/api/v1/assessments/[assessmentId]` | `src/app/api/v1/assessments/[assessmentId]/route.ts` | Demo integrated | Assessment detail with assigned-class, admin, and tenant checks. |
 | `/api/v1/teacher/gradebooks` | `src/app/api/v1/teacher/gradebooks/route.ts` | Demo integrated | Tenant-scoped gradebook sheet list with permission filtering. |
 | `/api/v1/gradebooks/[assessmentId]` | `src/app/api/v1/gradebooks/[assessmentId]/route.ts` | Demo integrated | Gradebook sheet read/save with assigned-class, admin, and tenant checks. |
+| `/api/v1/teacher/reports` | `src/app/api/v1/teacher/reports/route.ts` | Demo integrated | Tenant-scoped report readiness list with permission filtering. |
+| `/api/v1/reports/[classId]` | `src/app/api/v1/reports/[classId]/route.ts` | Demo integrated | Class report read/save with assigned-class, admin, and tenant checks. |
 
 ## Deprecated-Screen Candidates
 

@@ -24,6 +24,8 @@ fixtures in `src/lib/server/demo-store.ts`.
   assessment content, and a cross-tenant assessment.
 - Gradebook scores cover partial assigned sheets, same-tenant admin sheets, missing
   scores, and a cross-tenant score fixture.
+- Report comments cover ready and draft learner comments for assigned classes,
+  a same-tenant admin class, and a cross-tenant fixture.
 
 Required seed scenarios:
 
