@@ -10,7 +10,7 @@ export function TeacherSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-50 flex h-screen w-[280px] flex-col bg-navy">
+    <aside className="fixed left-0 top-0 z-50 hidden h-screen w-[280px] flex-col bg-navy lg:flex">
       <div className="p-6">
         <h1 className="font-display text-headline-md font-extrabold tracking-tight text-on-navy">
           Prep Pal
@@ -49,5 +49,31 @@ export function TeacherSidebar() {
         </Link>
       </div>
     </aside>
+  );
+}
+
+export function MobileTeacherNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="custom-scrollbar fixed bottom-0 left-0 right-0 z-50 flex gap-1 overflow-x-auto border-t border-surface-border bg-surface px-2 py-2 lg:hidden">
+      {teacherNavItems.map((item) => {
+        const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={cn(
+              "flex min-w-20 flex-col items-center justify-center gap-1 rounded-lg px-2 py-2 text-label-sm font-semibold transition-colors",
+              active ? "bg-primary text-on-primary" : "text-muted hover:bg-background",
+            )}
+          >
+            <Icon name={item.icon} className="text-[18px]" />
+            <span className="whitespace-nowrap">{item.label}</span>
+          </Link>
+        );
+      })}
+    </nav>
   );
 }

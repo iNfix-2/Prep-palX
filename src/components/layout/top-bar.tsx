@@ -8,8 +8,8 @@ export function TopBar({
   userRole: string;
 }) {
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-surface-border bg-surface px-8">
-      <div className="max-w-md flex-1">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b border-surface-border bg-surface px-4 md:px-8">
+      <div className="min-w-0 max-w-md flex-1">
         <div className="relative">
           <Icon
             name="search"
@@ -23,7 +23,7 @@ export function TopBar({
         </div>
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex shrink-0 items-center gap-4 md:gap-6">
         <button
           type="button"
           aria-label="Notifications"
@@ -40,11 +40,11 @@ export function TopBar({
               .slice(0, 2)
               .join("")}
           </div>
-          <div className="leading-tight">
+          <div className="hidden leading-tight sm:block">
             <p className="text-body-md font-semibold text-foreground">{userName}</p>
             <p className="text-label-sm uppercase tracking-wide text-muted">{userRole}</p>
           </div>
-          <Icon name="expand_more" className="text-[18px] text-muted" />
+          <Icon name="expand_more" className="hidden text-[18px] text-muted sm:block" />
         </div>
       </div>
     </header>
