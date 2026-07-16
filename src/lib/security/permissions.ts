@@ -1,6 +1,8 @@
 export const permissions = [
   "dashboard.view",
   "workspace.select",
+  "task.view",
+  "task.manage",
   "class.view_assigned",
   "class.manage",
   "timetable.view",

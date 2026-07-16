@@ -68,6 +68,8 @@ Preferred production approach:
 
 ## Permission Examples
 
+- `task.view`
+- `task.manage`
 - `class.view_assigned`
 - `class.manage`
 - `learner.view`

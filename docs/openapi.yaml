@@ -93,6 +93,128 @@ components:
                 type: string
               displayName:
                 type: string
+    TaskStatus:
+      type: string
+      enum: [open, in_progress, blocked, done]
+    TaskPriority:
+      type: string
+      enum: [low, medium, high, urgent]
+    TaskCategory:
+      type: string
+      enum: [lesson, assessment, grading, attendance, report, approval, resource, guardian_follow_up, admin]
+    TaskActivity:
+      type: object
+      required: [id, authorName, authorRole, body, createdAt]
+      properties:
+        id:
+          type: string
+        authorName:
+          type: string
+        authorRole:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    TeacherTask:
+      type: object
+      required: [id, workspaceId, ownerName, assignedName, title, description, status, priority, category, dueAt, createdAt, updatedAt, aiSuggested]
+      properties:
+        id:
+          type: string
+        workspaceId:
+          type: string
+        classId:
+          type: string
+        classDisplayName:
+          type: string
+        subjectName:
+          type: string
+        gradeName:
+          type: string
+        ownerName:
+          type: string
+        assignedName:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        priority:
+          $ref: "#/components/schemas/TaskPriority"
+        category:
+          $ref: "#/components/schemas/TaskCategory"
+        dueAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+        blockedReason:
+          type: string
+        sourceHref:
+          type: string
+        sourceLabel:
+          type: string
+        aiSuggested:
+          type: boolean
+    TaskDetail:
+      allOf:
+        - $ref: "#/components/schemas/TeacherTask"
+        - type: object
+          required: [workspace, permissions, activities]
+          properties:
+            workspace:
+              type: object
+            permissions:
+              type: object
+              required: [canManageTasks, canUseAi]
+              properties:
+                canManageTasks:
+                  type: boolean
+                canUseAi:
+                  type: boolean
+            classHref:
+              type: string
+            activities:
+              type: array
+              items:
+                $ref: "#/components/schemas/TaskActivity"
+    TeacherTasksResponse:
+      type: object
+      required: [workspace, permissions, tasks]
+      properties:
+        workspace:
+          type: object
+        permissions:
+          type: object
+          required: [canManageTasks, canUseAi]
+          properties:
+            canManageTasks:
+              type: boolean
+            canUseAi:
+              type: boolean
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeacherTask"
+    UpdateTaskStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        note:
+          type: string
     AttendanceStatus:
       type: string
       enum: [present, absent, late, excused]
@@ -1077,6 +1199,20 @@ paths:
           description: Unauthenticated.
         "403":
           description: Missing class permission.
+  /teacher/tasks:
+    get:
+      summary: List task queue items visible to the authenticated teacher.
+      responses:
+        "200":
+          description: Task queue items.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeacherTasksResponse"
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing task permission.
   /teacher/attendance:
     get:
       summary: List attendance registers for accessible classes.
@@ -1277,6 +1413,53 @@ paths:
           description: Class is outside permitted scope.
         "404":
           description: Class not found in active tenant.
+  /tasks/{taskId}:
+    get:
+      summary: Get task detail if the user has access.
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Task detail.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskDetail"
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Task is outside permitted scope.
+        "404":
+          description: Task not found in active tenant.
+    post:
+      summary: Update task status for an accessible task.
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTaskStatusRequest"
+      responses:
+        "200":
+          description: Updated task detail.
+        "400":
+          description: Invalid task status update.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Task is outside permitted scope or missing task update permission.
+        "404":
+          description: Task not found in active tenant.
   /lesson-plans/{lessonPlanId}:
     get:
       summary: Get lesson plan detail if the user has access.

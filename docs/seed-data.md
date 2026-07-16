@@ -16,6 +16,8 @@ fixtures in `src/lib/server/demo-store.ts`.
 - `class-p4-math` and `class-p3-english`: assigned to the demo teacher.
 - `class-p5-science`: same tenant, not assigned to the demo teacher; visible to admin.
 - `class-river-history`: different tenant; must return `404` from the Truth workspace.
+- Teacher tasks cover assigned work, class-scoped follow-ups, workspace-wide tasks,
+  same-tenant admin tasks, status/activity updates, and a cross-tenant fixture.
 - Attendance records for `2026-07-16` cover marked, partial, same-tenant
   unassigned, and cross-tenant register scenarios.
 - Lesson plans cover assigned teacher drafts, in-review plans, same-tenant admin

@@ -31,6 +31,48 @@ export interface DemoMembership {
   permissions: Permission[];
 }
 
+export type DemoTaskStatus = "open" | "in_progress" | "blocked" | "done";
+export type DemoTaskPriority = "low" | "medium" | "high" | "urgent";
+export type DemoTaskCategory =
+  | "lesson"
+  | "assessment"
+  | "grading"
+  | "attendance"
+  | "report"
+  | "approval"
+  | "resource"
+  | "guardian_follow_up"
+  | "admin";
+
+export interface DemoTaskActivity {
+  id: string;
+  authorMembershipId: string;
+  body: string;
+  createdAt: string;
+}
+
+export interface DemoTeacherTask {
+  id: string;
+  workspaceId: string;
+  classId?: string;
+  ownerMembershipId: string;
+  assignedMembershipId?: string;
+  title: string;
+  description: string;
+  status: DemoTaskStatus;
+  priority: DemoTaskPriority;
+  category: DemoTaskCategory;
+  dueAt: string;
+  createdAt: string;
+  updatedAt: string;
+  completedAt?: string;
+  blockedReason?: string;
+  sourceHref?: string;
+  sourceLabel?: string;
+  aiSuggested?: boolean;
+  activities: DemoTaskActivity[];
+}
+
 export interface DemoSession {
   token: string;
   userId: string;
@@ -369,6 +411,8 @@ export const demoMemberships: DemoMembership[] = [
     permissions: [
       "dashboard.view",
       "workspace.select",
+      "task.view",
+      "task.manage",
       "class.view_assigned",
       "timetable.view",
       "calendar.view",
@@ -399,6 +443,8 @@ export const demoMemberships: DemoMembership[] = [
     permissions: [
       "dashboard.view",
       "workspace.select",
+      "task.view",
+      "task.manage",
       "class.view_assigned",
       "class.manage",
       "timetable.view",
@@ -432,6 +478,7 @@ export const demoMemberships: DemoMembership[] = [
     permissions: [
       "dashboard.view",
       "workspace.select",
+      "task.view",
       "class.view_assigned",
       "timetable.view",
       "calendar.view",
@@ -655,6 +702,197 @@ export const demoClasses: DemoClass[] = [
     attentionCount: 0,
     tasks: [],
     recentActivity: ["Tenant isolation fixture."],
+  },
+];
+
+export const demoTeacherTasks: DemoTeacherTask[] = [
+  {
+    id: "task-p3-score-entry",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    ownerMembershipId: "mem-truth-teacher-ade",
+    assignedMembershipId: "mem-truth-teacher-ade",
+    title: "Enter English summary scores",
+    description:
+      "Complete the two pending learner rows before the comprehension assessment moves to reporting evidence.",
+    status: "open",
+    priority: "urgent",
+    category: "grading",
+    dueAt: "2026-07-16T16:00:00.000Z",
+    createdAt: "2026-07-16T09:30:00.000Z",
+    updatedAt: "2026-07-16T13:32:00.000Z",
+    sourceHref: "/gradebook/assessment-p3-comprehension",
+    sourceLabel: "Main Idea Exit Assessment scores",
+    activities: [
+      {
+        id: "task-activity-p3-score-entry-1",
+        authorMembershipId: "mem-truth-teacher-ade",
+        body: "Score entry opened after Zara's script was marked pending.",
+        createdAt: "2026-07-16T13:32:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "task-p4-revision-support",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    ownerMembershipId: "mem-truth-teacher-ade",
+    assignedMembershipId: "mem-truth-teacher-ade",
+    title: "Assign revision worksheet to support group",
+    description:
+      "Send the differentiated fractions worksheet to learners who need another visual-model practice set.",
+    status: "open",
+    priority: "high",
+    category: "resource",
+    dueAt: "2026-07-16T15:00:00.000Z",
+    createdAt: "2026-07-16T10:00:00.000Z",
+    updatedAt: "2026-07-16T14:05:00.000Z",
+    sourceHref: "/resources/resource-p4-fractions-worksheet",
+    sourceLabel: "Fractions Revision Worksheet",
+    aiSuggested: true,
+    activities: [
+      {
+        id: "task-activity-p4-revision-support-1",
+        authorMembershipId: "mem-truth-teacher-ade",
+        body: "Pal suggested a support task from the latest worksheet.",
+        createdAt: "2026-07-16T14:05:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "task-p4-guardian-follow-up",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    ownerMembershipId: "mem-truth-teacher-ade",
+    assignedMembershipId: "mem-truth-teacher-ade",
+    title: "Call Kene's guardian",
+    description:
+      "Follow up on today's absence and confirm a make-up plan for the fractions quick check.",
+    status: "in_progress",
+    priority: "high",
+    category: "guardian_follow_up",
+    dueAt: "2026-07-16T17:00:00.000Z",
+    createdAt: "2026-07-16T08:47:00.000Z",
+    updatedAt: "2026-07-16T12:00:00.000Z",
+    sourceHref: "/attendance/class-p4-math",
+    sourceLabel: "Primary 4 Mathematics attendance",
+    activities: [
+      {
+        id: "task-activity-p4-guardian-follow-up-1",
+        authorMembershipId: "mem-truth-teacher-ade",
+        body: "Created from the morning attendance register.",
+        createdAt: "2026-07-16T08:47:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "task-p4-report-gap",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    ownerMembershipId: "mem-truth-teacher-ade",
+    assignedMembershipId: "mem-truth-teacher-ade",
+    title: "Resolve report evidence gap",
+    description:
+      "Clear the missing quick-check score before Primary 4 Mathematics reports can be approved.",
+    status: "blocked",
+    priority: "high",
+    category: "report",
+    dueAt: "2026-07-17T09:00:00.000Z",
+    createdAt: "2026-07-16T15:00:00.000Z",
+    updatedAt: "2026-07-16T15:00:00.000Z",
+    blockedReason: "Waiting on Kene's make-up score.",
+    sourceHref: "/reports/class-p4-math",
+    sourceLabel: "Primary 4 Mathematics reports",
+    activities: [
+      {
+        id: "task-activity-p4-report-gap-1",
+        authorMembershipId: "mem-truth-admin",
+        body: "Reviewer requested the missing score before final approval.",
+        createdAt: "2026-07-16T15:00:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "task-p3-assessment-review",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    ownerMembershipId: "mem-truth-admin",
+    assignedMembershipId: "mem-truth-admin",
+    title: "Review Main Idea assessment",
+    description:
+      "Moderate vocabulary difficulty and publish the assessment when the passage is approved.",
+    status: "open",
+    priority: "medium",
+    category: "approval",
+    dueAt: "2026-07-18T12:00:00.000Z",
+    createdAt: "2026-07-16T13:00:00.000Z",
+    updatedAt: "2026-07-16T13:00:00.000Z",
+    sourceHref: "/approvals/approval-assessment-p3-comprehension",
+    sourceLabel: "Main Idea Exit Assessment approval",
+    activities: [],
+  },
+  {
+    id: "task-school-report-style-guide",
+    workspaceId: "school-truth",
+    ownerMembershipId: "mem-truth-teacher-ade",
+    assignedMembershipId: "mem-truth-teacher-ade",
+    title: "Review report comment style guide",
+    description:
+      "Confirm the workspace-wide style guide before finishing class report comments this week.",
+    status: "done",
+    priority: "low",
+    category: "admin",
+    dueAt: "2026-07-15T15:00:00.000Z",
+    createdAt: "2026-07-15T08:30:00.000Z",
+    updatedAt: "2026-07-16T08:10:00.000Z",
+    completedAt: "2026-07-16T08:10:00.000Z",
+    sourceHref: "/resources/resource-school-report-guide",
+    sourceLabel: "Report Comment Style Guide",
+    activities: [
+      {
+        id: "task-activity-school-report-style-guide-1",
+        authorMembershipId: "mem-truth-teacher-ade",
+        body: "Guide reviewed and ready for report comments.",
+        createdAt: "2026-07-16T08:10:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "task-p5-lab-check",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    ownerMembershipId: "mem-truth-admin",
+    assignedMembershipId: "mem-truth-admin",
+    title: "Confirm lab resources",
+    description:
+      "Check evaporation practical resources and safety guidance before the Monday lesson.",
+    status: "open",
+    priority: "low",
+    category: "lesson",
+    dueAt: "2026-07-18T10:00:00.000Z",
+    createdAt: "2026-07-15T15:10:00.000Z",
+    updatedAt: "2026-07-15T15:10:00.000Z",
+    sourceHref: "/resources/resource-p5-safety-guide",
+    sourceLabel: "Science Practical Safety Guide",
+    activities: [],
+  },
+  {
+    id: "task-river-community-cards",
+    workspaceId: "school-river",
+    classId: "class-river-history",
+    ownerMembershipId: "mem-river-teacher",
+    assignedMembershipId: "mem-river-teacher",
+    title: "Print community helper cards",
+    description: "Tenant isolation fixture for the task queue.",
+    status: "open",
+    priority: "medium",
+    category: "resource",
+    dueAt: "2026-07-17T08:30:00.000Z",
+    createdAt: "2026-07-16T10:45:00.000Z",
+    updatedAt: "2026-07-16T10:45:00.000Z",
+    sourceHref: "/resources/resource-river-community-pack",
+    sourceLabel: "Community Helpers Picture Cards",
+    activities: [],
   },
 ];
 
@@ -1734,6 +1972,47 @@ export function getAcademicCalendarEvent(eventId: string) {
 
 export function getResource(resourceId: string) {
   return demoResources.find((resource) => resource.id === resourceId) ?? null;
+}
+
+export function getTeacherTask(taskId: string) {
+  return demoTeacherTasks.find((task) => task.id === taskId) ?? null;
+}
+
+export function updateDemoTeacherTaskStatus(
+  taskId: string,
+  update: {
+    status: DemoTaskStatus;
+    updatedByMembershipId: string;
+    note?: string;
+  },
+) {
+  const task = getTeacherTask(taskId);
+
+  if (!task) {
+    return null;
+  }
+
+  const updatedAt = new Date().toISOString();
+  task.status = update.status;
+  task.updatedAt = updatedAt;
+  task.completedAt = update.status === "done" ? updatedAt : undefined;
+
+  if (update.status !== "blocked") {
+    task.blockedReason = undefined;
+  }
+
+  const note = update.note?.trim();
+
+  if (note) {
+    task.activities.push({
+      id: `task-activity-${task.id}-${task.activities.length + 1}`,
+      authorMembershipId: update.updatedByMembershipId,
+      body: note,
+      createdAt: updatedAt,
+    });
+  }
+
+  return task;
 }
 
 export function upsertDemoAttendanceRecords(

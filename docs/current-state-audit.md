@@ -74,6 +74,8 @@ UI routes:
 - `/login` via `src/app/login/page.tsx`
 - `/classes` via `src/app/(teacher)/classes/page.tsx`
 - `/classes/[classId]` via `src/app/(teacher)/classes/[classId]/page.tsx`
+- `/my-tasks` via `src/app/(teacher)/my-tasks/page.tsx`
+- `/my-tasks/[taskId]` via `src/app/(teacher)/my-tasks/[taskId]/page.tsx`
 - `/attendance` via `src/app/(teacher)/attendance/page.tsx`
 - `/attendance/[classId]` via `src/app/(teacher)/attendance/[classId]/page.tsx`
 - `/lesson-planner` via `src/app/(teacher)/lesson-planner/page.tsx`
@@ -87,6 +89,10 @@ UI routes:
 - `/question-bank/[questionId]` via `src/app/(teacher)/question-bank/[questionId]/page.tsx`
 - `/timetable` via `src/app/(teacher)/timetable/page.tsx`
 - `/timetable/[eventId]` via `src/app/(teacher)/timetable/[eventId]/page.tsx`
+- `/academic-calendar` via `src/app/(teacher)/academic-calendar/page.tsx`
+- `/academic-calendar/[eventId]` via `src/app/(teacher)/academic-calendar/[eventId]/page.tsx`
+- `/resources` via `src/app/(teacher)/resources/page.tsx`
+- `/resources/[resourceId]` via `src/app/(teacher)/resources/[resourceId]/page.tsx`
 - `/gradebook` via `src/app/(teacher)/gradebook/page.tsx`
 - `/gradebook/[assessmentId]` via `src/app/(teacher)/gradebook/[assessmentId]/page.tsx`
 - `/reports` via `src/app/(teacher)/reports/page.tsx`
@@ -112,6 +118,8 @@ First-slice API routes:
 - `/api/v1/me`
 - `/api/v1/workspaces`
 - `/api/v1/workspaces/select`
+- `/api/v1/teacher/tasks`
+- `/api/v1/tasks/[taskId]`
 - `/api/v1/teacher/classes`
 - `/api/v1/classes/[classId]`
 - `/api/v1/teacher/attendance`
@@ -147,6 +155,7 @@ The current repo contains a scaffolded subset of the larger Stitch design:
 - Dynamic teacher workspace renderer for sidebar modules.
 - Dynamic builder renderer for lesson and assessment draft flows.
 - First-slice My Classes and Class Overview screens.
+- My Tasks and Task Detail demo slice.
 - Attendance and Attendance Register demo slice.
 - Lesson Planner, New Lesson Plan, and Lesson Plan Detail demo slice.
 - Assessments, New Assessment, and Assessment Detail demo slice.
@@ -162,7 +171,7 @@ The broader 88-screen Stitch design is not present as discrete source files in t
 
 ## 7. Existing API Calls
 
-No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class, attendance, lesson-planner, assessment, question-bank, timetable, academic-calendar, resources, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`, `src/lib/server/academic-calendar-service.ts`, `src/lib/server/resources-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
+No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The tasks, class, attendance, lesson-planner, assessment, question-bank, timetable, academic-calendar, resources, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/tasks-service.ts`, `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`, `src/lib/server/academic-calendar-service.ts`, `src/lib/server/resources-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
 
 ## 8. Existing Mock Services and Mock Data
 

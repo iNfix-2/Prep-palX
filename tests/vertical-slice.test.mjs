@@ -1040,6 +1040,85 @@ test("admin membership can review approvals in the active workspace", async () =
   assert.match(await adminDetailPage.text(), /Reviewer Decision/);
 });
 
+test("teacher tasks slice scopes queue items and updates task status", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/tasks`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const tasks = await getJson("/api/v1/teacher/tasks", teacherCookie);
+  const taskIds = tasks.tasks.map((task) => task.id);
+
+  assert.ok(taskIds.includes("task-p3-score-entry"));
+  assert.ok(taskIds.includes("task-p4-revision-support"));
+  assert.ok(taskIds.includes("task-p4-report-gap"));
+  assert.ok(taskIds.includes("task-p3-assessment-review"));
+  assert.ok(taskIds.includes("task-school-report-style-guide"));
+  assert.ok(!taskIds.includes("task-p5-lab-check"));
+
+  const assignedTask = await fetchJson(
+    "/api/v1/tasks/task-p4-revision-support",
+    teacherCookie,
+  );
+  assert.equal(assignedTask.response.status, 200);
+  assert.equal(assignedTask.body.data.sourceHref, "/resources/resource-p4-fractions-worksheet");
+
+  const unassignedTask = await fetchJson("/api/v1/tasks/task-p5-lab-check", teacherCookie);
+  assert.equal(unassignedTask.response.status, 403);
+
+  const crossTenantTask = await fetchJson(
+    "/api/v1/tasks/task-river-community-cards",
+    teacherCookie,
+  );
+  assert.equal(crossTenantTask.response.status, 404);
+
+  const invalidStatus = await postJson(
+    "/api/v1/tasks/task-p4-revision-support",
+    teacherCookie,
+    { status: "waiting" },
+  );
+  assert.equal(invalidStatus.response.status, 400);
+
+  const updated = await postJson(
+    "/api/v1/tasks/task-p4-revision-support",
+    teacherCookie,
+    { status: "done", note: "Worksheet assigned to the support group." },
+  );
+  assert.equal(updated.response.status, 200);
+  assert.equal(updated.body.data.status, "done");
+  assert.ok(updated.body.data.activities.length >= 2);
+
+  const tasksPage = await fetch(`${baseUrl}/my-tasks`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(tasksPage.status, 200);
+  assert.match(await tasksPage.text(), /Enter English summary scores/);
+
+  const detailPage = await fetch(`${baseUrl}/my-tasks/task-p4-report-gap`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Save status/);
+});
+
+test("admin membership can view and update all tasks in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const tasks = await getJson("/api/v1/teacher/tasks", adminCookie);
+  const taskIds = tasks.tasks.map((task) => task.id);
+
+  assert.ok(taskIds.includes("task-p5-lab-check"));
+
+  const scienceTask = await fetchJson("/api/v1/tasks/task-p5-lab-check", adminCookie);
+  assert.equal(scienceTask.response.status, 200);
+  assert.equal(scienceTask.body.data.classDisplayName, "Primary 5 Basic Science");
+
+  const updated = await postJson("/api/v1/tasks/task-p5-lab-check", adminCookie, {
+    status: "done",
+    note: "Lab resources confirmed.",
+  });
+  assert.equal(updated.response.status, 200);
+  assert.equal(updated.body.data.status, "done");
+});
+
 async function login(email, password) {
   const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: "POST",

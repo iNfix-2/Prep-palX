@@ -82,6 +82,11 @@ Implemented coverage:
 - Teachers cannot submit reviewer decisions without reviewer permission.
 - Reviewer decisions validate required change notes and update linked workflow state.
 - Admin membership can review all approvals in the active tenant.
+- Unauthenticated `/api/v1/teacher/tasks` returns `401`.
+- Teacher tasks are filtered to owner, assignee, workspace, and assigned-class scope.
+- Task detail follows same-tenant `403` and cross-tenant `404` rules.
+- Task status updates validate supported statuses and append activity notes.
+- Admin membership can view and update all tasks in the active tenant.
 
 Cover:
 
@@ -110,29 +115,31 @@ Initial critical path is partially covered by the integration test:
 2. Workspace selection.
 3. My Classes.
 4. Class Overview.
-5. Attendance.
-6. Attendance Register.
-7. Lesson Planner.
-8. New Lesson Plan.
-9. Lesson Plan Detail.
-10. Assessments.
-11. New Assessment.
-12. Assessment Detail.
-13. Question Bank.
-14. New Question.
-15. Question Detail.
-16. Timetable.
-17. Timetable Event.
-18. Academic Calendar.
-19. Calendar Event.
-20. Resources.
-21. Resource Detail.
-22. Gradebook.
-23. Gradebook Sheet.
-24. Reports.
-25. Class Report.
-26. Approvals.
-27. Approval Detail.
+5. My Tasks.
+6. Task Detail.
+7. Attendance.
+8. Attendance Register.
+9. Lesson Planner.
+10. New Lesson Plan.
+11. Lesson Plan Detail.
+12. Assessments.
+13. New Assessment.
+14. Assessment Detail.
+15. Question Bank.
+16. New Question.
+17. Question Detail.
+18. Timetable.
+19. Timetable Event.
+20. Academic Calendar.
+21. Calendar Event.
+22. Resources.
+23. Resource Detail.
+24. Gradebook.
+25. Gradebook Sheet.
+26. Reports.
+27. Class Report.
+28. Approvals.
+29. Approval Detail.
 
 Future paths:
 

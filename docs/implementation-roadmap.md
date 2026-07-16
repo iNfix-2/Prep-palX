@@ -40,8 +40,8 @@ Features: Teacher Dashboard, My Classes, Class Overview, daily attendance, class
 Acceptance: teacher sees only assigned classes; class detail is tenant-scoped.
 
 Complexity: large. Status: demo slices implemented for My Classes, Class Overview,
-daily Attendance, and Lesson Planner with in-memory seed data. Classroom records,
-tasks persistence, and dashboard backend integration are not started.
+My Tasks, daily Attendance, and Lesson Planner with in-memory seed data. Classroom
+records, production task persistence, and dashboard backend integration are not started.
 
 ## Phase D: Assessment and Gradebook
 
@@ -75,8 +75,8 @@ Objective: behaviour, psychomotor, incidents, homework, parent contact, extended
 
 Dependencies: core people/classes model.
 
-Complexity: large. Status: lesson planning, timetable, academic calendar, and
-resources demo slices are implemented with in-memory seed data. Tasks, behaviour,
+Complexity: large. Status: lesson planning, tasks, timetable, academic calendar, and
+resources demo slices are implemented with in-memory seed data. Behaviour,
 psychomotor, incidents, homework, parent contact, production scheduling, and
 scheduling/resource write operations are not started.
 
@@ -107,6 +107,7 @@ and production workflow storage are not started.
 
 Replace `src/lib/server/demo-store.ts` with a real database repository layer while
 preserving the service boundaries in `src/lib/server/classes-service.ts` and
+`src/lib/server/tasks-service.ts`,
 `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`,
 `src/lib/server/assessments-service.ts`, `src/lib/server/gradebook-service.ts`,
 `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`,
