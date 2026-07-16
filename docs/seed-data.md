@@ -1,0 +1,30 @@
+# Seed Data Instructions
+
+Seed tooling does not exist yet. The first vertical slice uses deterministic in-memory
+fixtures in `src/lib/server/demo-store.ts`.
+
+## Current Demo Accounts
+
+- Teacher: `mrs.adeyemi@truth.test` / `password`
+- Admin: `admin@truth.test` / `password`
+- Cross-tenant teacher fixture: `river.teacher@truth.test` / `password`
+
+## Current Demo Fixtures
+
+- `school-truth`: active workspace for the teacher and admin accounts.
+- `school-river`: separate tenant used to verify tenant isolation.
+- `class-p4-math` and `class-p3-english`: assigned to the demo teacher.
+- `class-p5-science`: same tenant, not assigned to the demo teacher; visible to admin.
+- `class-river-history`: different tenant; must return `404` from the Truth workspace.
+
+Required seed scenarios:
+
+- School A and School B.
+- Teacher assigned to School A classes only.
+- School admin with broad School A permissions.
+- User with memberships in two schools.
+- Empty class.
+- Large class.
+- Learners with long names and missing optional fields.
+- Archived classes and learners.
+- Unauthorized user with no active membership.

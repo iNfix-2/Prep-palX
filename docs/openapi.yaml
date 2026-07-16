@@ -1,0 +1,184 @@
+openapi: 3.1.0
+info:
+  title: Prep Pal API
+  version: 0.1.0
+  description: Initial stable API contract for Prep Pal integration.
+servers:
+  - url: /api/v1
+security:
+  - cookieSession: []
+components:
+  securitySchemes:
+    cookieSession:
+      type: apiKey
+      in: cookie
+      name: prep_pal_session
+  schemas:
+    ApiError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, requestId]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            requestId:
+              type: string
+            fields:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+    UserProfile:
+      type: object
+      required: [id, email, displayName]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+          format: email
+        displayName:
+          type: string
+    Workspace:
+      type: object
+      required: [id, name, role]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+    TeacherClassListItem:
+      type: object
+      required: [id, displayName, subjectName, academicYearName, learnerCount]
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        subjectName:
+          type: string
+        academicYearName:
+          type: string
+        learnerCount:
+          type: integer
+        room:
+          type: string
+        nextLesson:
+          type: string
+    ClassOverview:
+      type: object
+      required: [id, displayName, subjectName, learners]
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        subjectName:
+          type: string
+        learners:
+          type: array
+          items:
+            type: object
+            required: [id, displayName]
+            properties:
+              id:
+                type: string
+              displayName:
+                type: string
+paths:
+  /auth/login:
+    post:
+      summary: Create a demo session from form credentials.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        "303":
+          description: Redirects to `/classes` and sets session cookies.
+  /auth/logout:
+    post:
+      summary: Clear the current demo session.
+      responses:
+        "303":
+          description: Redirects to `/login` and clears session cookies.
+  /me:
+    get:
+      summary: Current authenticated user and active workspace.
+      responses:
+        "200":
+          description: Current user.
+        "401":
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /workspaces:
+    get:
+      summary: List workspaces available to the current user.
+      responses:
+        "200":
+          description: Workspace list.
+  /workspaces/select:
+    post:
+      summary: Select active workspace.
+      responses:
+        "200":
+          description: Active workspace selected.
+        "403":
+          description: User is not a member of workspace.
+  /teacher/classes:
+    get:
+      summary: List classes assigned to the authenticated teacher.
+      parameters:
+        - in: query
+          name: academicYearId
+          schema:
+            type: string
+        - in: query
+          name: termId
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Assigned classes.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing class permission.
+  /classes/{classId}:
+    get:
+      summary: Get class overview if the user has access.
+      parameters:
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Class overview.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Class is outside permitted scope.
+        "404":
+          description: Class not found in active tenant.

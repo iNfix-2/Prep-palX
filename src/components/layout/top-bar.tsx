@@ -3,9 +3,11 @@ import { Icon } from "@/components/ui/icon";
 export function TopBar({
   userName,
   userRole,
+  workspaceName,
 }: {
   userName: string;
   userRole: string;
+  workspaceName?: string;
 }) {
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-4 border-b border-surface-border bg-surface px-4 md:px-8">
@@ -24,6 +26,13 @@ export function TopBar({
       </div>
 
       <div className="flex shrink-0 items-center gap-4 md:gap-6">
+        {workspaceName && (
+          <div className="hidden max-w-[220px] border-r border-surface-border pr-5 leading-tight md:block">
+            <p className="truncate text-body-md font-semibold text-foreground">{workspaceName}</p>
+            <p className="text-label-sm uppercase tracking-wide text-muted">Active workspace</p>
+          </div>
+        )}
+
         <button
           type="button"
           aria-label="Notifications"
@@ -44,7 +53,15 @@ export function TopBar({
             <p className="text-body-md font-semibold text-foreground">{userName}</p>
             <p className="text-label-sm uppercase tracking-wide text-muted">{userRole}</p>
           </div>
-          <Icon name="expand_more" className="hidden text-[18px] text-muted sm:block" />
+          <form action="/api/v1/auth/logout" method="post">
+            <button
+              type="submit"
+              aria-label="Sign out"
+              className="text-muted transition-colors hover:text-foreground"
+            >
+              <Icon name="logout" className="text-[18px]" />
+            </button>
+          </form>
         </div>
       </div>
     </header>
