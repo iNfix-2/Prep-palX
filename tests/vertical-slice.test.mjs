@@ -1219,6 +1219,66 @@ test("support manager can view and resolve all support requests in the active wo
   assert.equal(resolved.body.data.status, "resolved");
 });
 
+test("settings slice manages account preferences and workspace selection scope", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/settings`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const settings = await getJson("/api/v1/settings", teacherCookie);
+
+  assert.equal(settings.user.email, "mrs.adeyemi@truth.test");
+  assert.equal(settings.activeWorkspace.id, "school-truth");
+  assert.equal(settings.permissions.canManageAccount, true);
+  assert.equal(settings.preferences.weeklyDigest, true);
+
+  const invalidSettings = await postJson("/api/v1/settings", teacherCookie, {
+    emailNotifications: true,
+    inAppNotifications: true,
+    dueDateReminders: true,
+    supportUpdates: true,
+    weeklyDigest: true,
+    density: "dense",
+    highContrast: false,
+    language: "en",
+    timezone: "Africa/Lagos",
+    aiConfirmationMode: "high_impact",
+    aiSourceAccess: true,
+  });
+  assert.equal(invalidSettings.response.status, 400);
+
+  const updated = await postJson("/api/v1/settings", teacherCookie, {
+    emailNotifications: false,
+    inAppNotifications: true,
+    dueDateReminders: true,
+    supportUpdates: false,
+    weeklyDigest: false,
+    density: "compact",
+    highContrast: true,
+    language: "en",
+    timezone: "UTC",
+    aiConfirmationMode: "always",
+    aiSourceAccess: true,
+  });
+  assert.equal(updated.response.status, 200);
+  assert.equal(updated.body.data.preferences.emailNotifications, false);
+  assert.equal(updated.body.data.preferences.density, "compact");
+  assert.equal(updated.body.data.preferences.timezone, "UTC");
+  assert.equal(updated.body.data.preferences.aiConfirmationMode, "always");
+
+  const forbiddenWorkspace = await postJson("/api/v1/workspaces/select", teacherCookie, {
+    workspaceId: "school-river",
+  });
+  assert.equal(forbiddenWorkspace.response.status, 403);
+
+  const settingsPage = await fetch(`${baseUrl}/settings`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(settingsPage.status, 200);
+  const settingsHtml = await settingsPage.text();
+  assert.match(settingsHtml, /Save settings/);
+  assert.match(settingsHtml, /Truth International School/);
+});
+
 async function login(email, password) {
   const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: "POST",

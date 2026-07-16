@@ -55,6 +55,143 @@ components:
           type: string
         role:
           type: string
+    InterfaceDensity:
+      type: string
+      enum: [comfortable, compact]
+    AiConfirmationMode:
+      type: string
+      enum: [always, high_impact, manual]
+    AccountWorkspace:
+      type: object
+      required: [id, name, roleName, jobTitle, academicYearName, termName, isActive]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        roleName:
+          type: string
+        jobTitle:
+          type: string
+        academicYearName:
+          type: string
+        termName:
+          type: string
+        isActive:
+          type: boolean
+    AccountPreferences:
+      type: object
+      required: [emailNotifications, inAppNotifications, dueDateReminders, supportUpdates, weeklyDigest, density, highContrast, language, timezone, aiConfirmationMode, aiSourceAccess, updatedAt]
+      properties:
+        emailNotifications:
+          type: boolean
+        inAppNotifications:
+          type: boolean
+        dueDateReminders:
+          type: boolean
+        supportUpdates:
+          type: boolean
+        weeklyDigest:
+          type: boolean
+        density:
+          $ref: "#/components/schemas/InterfaceDensity"
+        highContrast:
+          type: boolean
+        language:
+          type: string
+        timezone:
+          type: string
+        aiConfirmationMode:
+          $ref: "#/components/schemas/AiConfirmationMode"
+        aiSourceAccess:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+    AccountSecurity:
+      type: object
+      required: [activeSessionCount, passwordUpdatedAt]
+      properties:
+        activeSessionCount:
+          type: integer
+        passwordUpdatedAt:
+          type: string
+          format: date-time
+    AccountAiUsage:
+      type: object
+      required: [promptsUsed, promptLimit, usagePercent]
+      properties:
+        promptsUsed:
+          type: integer
+        promptLimit:
+          type: integer
+        usagePercent:
+          type: integer
+    AccountSettingsResponse:
+      type: object
+      required: [user, activeWorkspace, workspaces, permissions, preferences, security, aiUsage]
+      properties:
+        user:
+          type: object
+          required: [id, displayName, shortName, email]
+          properties:
+            id:
+              type: string
+            displayName:
+              type: string
+            shortName:
+              type: string
+            email:
+              type: string
+              format: email
+        activeWorkspace:
+          $ref: "#/components/schemas/AccountWorkspace"
+        workspaces:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccountWorkspace"
+        permissions:
+          type: object
+          required: [canManageAccount, canSwitchWorkspace, canUseAi]
+          properties:
+            canManageAccount:
+              type: boolean
+            canSwitchWorkspace:
+              type: boolean
+            canUseAi:
+              type: boolean
+        preferences:
+          $ref: "#/components/schemas/AccountPreferences"
+        security:
+          $ref: "#/components/schemas/AccountSecurity"
+        aiUsage:
+          $ref: "#/components/schemas/AccountAiUsage"
+    UpdateAccountSettings:
+      type: object
+      required: [emailNotifications, inAppNotifications, dueDateReminders, supportUpdates, weeklyDigest, density, highContrast, language, timezone, aiConfirmationMode, aiSourceAccess]
+      properties:
+        emailNotifications:
+          type: boolean
+        inAppNotifications:
+          type: boolean
+        dueDateReminders:
+          type: boolean
+        supportUpdates:
+          type: boolean
+        weeklyDigest:
+          type: boolean
+        density:
+          $ref: "#/components/schemas/InterfaceDensity"
+        highContrast:
+          type: boolean
+        language:
+          type: string
+        timezone:
+          type: string
+        aiConfirmationMode:
+          $ref: "#/components/schemas/AiConfirmationMode"
+        aiSourceAccess:
+          type: boolean
     TeacherClassListItem:
       type: object
       required: [id, displayName, subjectName, academicYearName, learnerCount]
@@ -1334,6 +1471,61 @@ paths:
           description: Active workspace selected.
         "403":
           description: User is not a member of workspace.
+  /settings:
+    get:
+      summary: Current account settings for the active membership.
+      responses:
+        "200":
+          description: Account settings.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountSettingsResponse"
+        "401":
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Missing account settings permission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    post:
+      summary: Update account preferences for the active membership.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAccountSettings"
+      responses:
+        "200":
+          description: Updated account settings.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountSettingsResponse"
+        "400":
+          description: Invalid account settings.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Missing account settings permission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
   /teacher/classes:
     get:
       summary: List classes assigned to the authenticated teacher.

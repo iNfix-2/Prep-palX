@@ -31,6 +31,46 @@ export interface DemoMembership {
   permissions: Permission[];
 }
 
+export type DemoInterfaceDensity = "comfortable" | "compact";
+export type DemoAiConfirmationMode = "always" | "high_impact" | "manual";
+
+export interface DemoAccountSettings {
+  membershipId: string;
+  emailNotifications: boolean;
+  inAppNotifications: boolean;
+  dueDateReminders: boolean;
+  supportUpdates: boolean;
+  weeklyDigest: boolean;
+  density: DemoInterfaceDensity;
+  highContrast: boolean;
+  language: string;
+  timezone: string;
+  aiConfirmationMode: DemoAiConfirmationMode;
+  aiSourceAccess: boolean;
+  monthlyAiLimit: number;
+  monthlyAiUsed: number;
+  activeSessionCount: number;
+  passwordUpdatedAt: string;
+  updatedAt: string;
+}
+
+export type DemoAccountSettingsUpdate = Partial<
+  Pick<
+    DemoAccountSettings,
+    | "emailNotifications"
+    | "inAppNotifications"
+    | "dueDateReminders"
+    | "supportUpdates"
+    | "weeklyDigest"
+    | "density"
+    | "highContrast"
+    | "language"
+    | "timezone"
+    | "aiConfirmationMode"
+    | "aiSourceAccess"
+  >
+>;
+
 export type DemoTaskStatus = "open" | "in_progress" | "blocked" | "done";
 export type DemoTaskPriority = "low" | "medium" | "high" | "urgent";
 export type DemoTaskCategory =
@@ -461,6 +501,7 @@ export const demoMemberships: DemoMembership[] = [
     jobTitle: "Lead Teacher",
     permissions: [
       "dashboard.view",
+      "account.manage_self",
       "workspace.select",
       "task.view",
       "task.manage",
@@ -495,6 +536,7 @@ export const demoMemberships: DemoMembership[] = [
     jobTitle: "Academic Administrator",
     permissions: [
       "dashboard.view",
+      "account.manage_self",
       "workspace.select",
       "task.view",
       "task.manage",
@@ -533,6 +575,7 @@ export const demoMemberships: DemoMembership[] = [
     jobTitle: "Class Teacher",
     permissions: [
       "dashboard.view",
+      "account.manage_self",
       "workspace.select",
       "task.view",
       "class.view_assigned",
@@ -552,6 +595,66 @@ export const demoSessions: DemoSession[] = [
   { token: "session-teacher-ade", userId: "user-ade" },
   { token: "session-admin-truth", userId: "user-admin-truth" },
   { token: "session-river-teacher", userId: "user-river" },
+];
+
+export const demoAccountSettings: DemoAccountSettings[] = [
+  {
+    membershipId: "mem-truth-teacher-ade",
+    emailNotifications: true,
+    inAppNotifications: true,
+    dueDateReminders: true,
+    supportUpdates: true,
+    weeklyDigest: true,
+    density: "comfortable",
+    highContrast: false,
+    language: "en",
+    timezone: "Africa/Lagos",
+    aiConfirmationMode: "high_impact",
+    aiSourceAccess: true,
+    monthlyAiLimit: 250,
+    monthlyAiUsed: 205,
+    activeSessionCount: 2,
+    passwordUpdatedAt: "2026-06-04T08:30:00.000Z",
+    updatedAt: "2026-07-15T11:20:00.000Z",
+  },
+  {
+    membershipId: "mem-truth-admin",
+    emailNotifications: true,
+    inAppNotifications: true,
+    dueDateReminders: true,
+    supportUpdates: true,
+    weeklyDigest: false,
+    density: "compact",
+    highContrast: false,
+    language: "en",
+    timezone: "Africa/Lagos",
+    aiConfirmationMode: "always",
+    aiSourceAccess: true,
+    monthlyAiLimit: 400,
+    monthlyAiUsed: 124,
+    activeSessionCount: 1,
+    passwordUpdatedAt: "2026-05-29T09:15:00.000Z",
+    updatedAt: "2026-07-14T15:45:00.000Z",
+  },
+  {
+    membershipId: "mem-river-teacher",
+    emailNotifications: true,
+    inAppNotifications: false,
+    dueDateReminders: true,
+    supportUpdates: false,
+    weeklyDigest: true,
+    density: "comfortable",
+    highContrast: true,
+    language: "en",
+    timezone: "Africa/Lagos",
+    aiConfirmationMode: "manual",
+    aiSourceAccess: false,
+    monthlyAiLimit: 120,
+    monthlyAiUsed: 0,
+    activeSessionCount: 1,
+    passwordUpdatedAt: "2026-06-18T10:00:00.000Z",
+    updatedAt: "2026-07-12T09:00:00.000Z",
+  },
 ];
 
 export const demoLearners: DemoLearner[] = [
@@ -2517,6 +2620,49 @@ export function createDemoQuestion(
 
   demoQuestions.push(question);
   return question;
+}
+
+export function getDemoAccountSettings(membershipId: string) {
+  let settings = demoAccountSettings.find((item) => item.membershipId === membershipId);
+
+  if (!settings) {
+    settings = createDefaultAccountSettings(membershipId);
+    demoAccountSettings.push(settings);
+  }
+
+  return settings;
+}
+
+export function updateDemoAccountSettings(
+  membershipId: string,
+  update: DemoAccountSettingsUpdate,
+) {
+  const settings = getDemoAccountSettings(membershipId);
+
+  Object.assign(settings, update, { updatedAt: new Date().toISOString() });
+  return settings;
+}
+
+function createDefaultAccountSettings(membershipId: string): DemoAccountSettings {
+  return {
+    membershipId,
+    emailNotifications: true,
+    inAppNotifications: true,
+    dueDateReminders: true,
+    supportUpdates: true,
+    weeklyDigest: true,
+    density: "comfortable",
+    highContrast: false,
+    language: "en",
+    timezone: "Africa/Lagos",
+    aiConfirmationMode: "high_impact",
+    aiSourceAccess: true,
+    monthlyAiLimit: 150,
+    monthlyAiUsed: 0,
+    activeSessionCount: 1,
+    passwordUpdatedAt: "2026-06-01T09:00:00.000Z",
+    updatedAt: "2026-07-01T09:00:00.000Z",
+  };
 }
 
 function calculateLessonReadiness(input: {

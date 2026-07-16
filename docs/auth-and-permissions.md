@@ -10,6 +10,7 @@ First vertical-slice demo implementation exists:
 - `src/lib/server/auth-context.ts` resolves user, active workspace, membership, and permissions.
 - `src/lib/security/permissions.ts` defines the first permission set.
 - `src/lib/server/classes-service.ts` enforces tenant and class permissions.
+- `src/lib/server/settings-service.ts` enforces self-account and workspace selection permissions.
 
 This is not production authentication. Passwords and sessions are deterministic demo
 fixtures in `src/lib/server/demo-store.ts`.
@@ -70,6 +71,8 @@ Preferred production approach:
 
 - `task.view`
 - `task.manage`
+- `account.manage_self`
+- `workspace.select`
 - `support.view`
 - `support.request`
 - `support.manage`

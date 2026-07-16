@@ -16,8 +16,9 @@ Use dependency order, not time estimates.
 - Acceptance: protected APIs enforce session, tenant, permission.
 - Complexity: large.
 - Status: first demo implementation complete for teacher login, active workspace cookies,
-  membership lookup, and class permissions. Production session storage, password security,
-  audit, and database-backed roles are still required.
+  workspace selection, self-service account settings, membership lookup, and class
+  permissions. Production session storage, password security, audit, and
+  database-backed roles/preferences are still required.
 
 ## Phase B: Academic Foundation
 
@@ -110,6 +111,7 @@ Replace `src/lib/server/demo-store.ts` with a real database repository layer whi
 preserving the service boundaries in `src/lib/server/classes-service.ts` and
 `src/lib/server/tasks-service.ts`,
 `src/lib/server/help-service.ts`,
+`src/lib/server/settings-service.ts`,
 `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`,
 `src/lib/server/assessments-service.ts`, `src/lib/server/gradebook-service.ts`,
 `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`,

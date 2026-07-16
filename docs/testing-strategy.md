@@ -94,6 +94,10 @@ Implemented coverage:
 - Support request creation validates required fields and active-workspace scope.
 - Support messages append to the request conversation.
 - Support managers can view and resolve all requests in the active tenant.
+- Unauthenticated `/api/v1/settings` returns `401`.
+- Settings returns active user, workspace, memberships, preferences, security metadata, and AI usage.
+- Settings preference saves validate supported density, language, timezone, and AI confirmation modes.
+- Workspace selection rejects workspaces outside the current user's memberships.
 
 Cover:
 
@@ -120,35 +124,36 @@ Initial critical path is partially covered by the integration test:
 
 1. Login.
 2. Workspace selection.
-3. My Classes.
-4. Class Overview.
-5. My Tasks.
-6. Task Detail.
-7. Help Centre.
-8. Support Request Detail.
-9. Attendance.
-10. Attendance Register.
-11. Lesson Planner.
-12. New Lesson Plan.
-13. Lesson Plan Detail.
-14. Assessments.
-15. New Assessment.
-16. Assessment Detail.
-17. Question Bank.
-18. New Question.
-19. Question Detail.
-20. Timetable.
-21. Timetable Event.
-22. Academic Calendar.
-23. Calendar Event.
-24. Resources.
-25. Resource Detail.
-26. Gradebook.
-27. Gradebook Sheet.
-28. Reports.
-29. Class Report.
-30. Approvals.
-31. Approval Detail.
+3. Settings.
+4. My Classes.
+5. Class Overview.
+6. My Tasks.
+7. Task Detail.
+8. Help Centre.
+9. Support Request Detail.
+10. Attendance.
+11. Attendance Register.
+12. Lesson Planner.
+13. New Lesson Plan.
+14. Lesson Plan Detail.
+15. Assessments.
+16. New Assessment.
+17. Assessment Detail.
+18. Question Bank.
+19. New Question.
+20. Question Detail.
+21. Timetable.
+22. Timetable Event.
+23. Academic Calendar.
+24. Calendar Event.
+25. Resources.
+26. Resource Detail.
+27. Gradebook.
+28. Gradebook Sheet.
+29. Reports.
+30. Class Report.
+31. Approvals.
+32. Approval Detail.
 
 Future paths:
 
