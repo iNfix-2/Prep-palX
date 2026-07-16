@@ -86,10 +86,11 @@ Objective: approvals, automation, support administration, AI assistant.
 
 Dependencies: stable domain services, audit, permissions.
 
-Complexity: extra-large. Status: approval queue and approval detail demo slices
-are implemented with teacher tracking, reviewer actions, and in-memory workflow
-fixtures. Automation, support administration, AI action approval, durable audit,
-and production workflow storage are not started.
+Complexity: extra-large. Status: approval queue, approval detail, Help Centre,
+and support request detail demo slices are implemented with teacher tracking,
+reviewer/support actions, and in-memory workflow fixtures. Automation, AI action
+approval, durable audit, production support storage, and production workflow
+storage are not started.
 
 ## Minimum Next Changes for First Vertical Slice
 
@@ -108,6 +109,7 @@ and production workflow storage are not started.
 Replace `src/lib/server/demo-store.ts` with a real database repository layer while
 preserving the service boundaries in `src/lib/server/classes-service.ts` and
 `src/lib/server/tasks-service.ts`,
+`src/lib/server/help-service.ts`,
 `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`,
 `src/lib/server/assessments-service.ts`, `src/lib/server/gradebook-service.ts`,
 `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`,

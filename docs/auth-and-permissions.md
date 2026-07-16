@@ -70,6 +70,9 @@ Preferred production approach:
 
 - `task.view`
 - `task.manage`
+- `support.view`
+- `support.request`
+- `support.manage`
 - `class.view_assigned`
 - `class.manage`
 - `learner.view`
@@ -97,7 +100,6 @@ Preferred production approach:
 - `school.settings.manage`
 - `staff.manage`
 - `timetable.manage`
-- `support.manage`
 - `automation.manage`
 - `ai.use`
 - `ai.approve_action`

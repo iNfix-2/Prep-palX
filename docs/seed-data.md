@@ -18,6 +18,9 @@ fixtures in `src/lib/server/demo-store.ts`.
 - `class-river-history`: different tenant; must return `404` from the Truth workspace.
 - Teacher tasks cover assigned work, class-scoped follow-ups, workspace-wide tasks,
   same-tenant admin tasks, status/activity updates, and a cross-tenant fixture.
+- Support guides and support requests cover global guides, workspace guides,
+  teacher-owned requests, same-tenant support-manager requests, conversation
+  updates, resolved requests, and a cross-tenant fixture.
 - Attendance records for `2026-07-16` cover marked, partial, same-tenant
   unassigned, and cross-tenant register scenarios.
 - Lesson plans cover assigned teacher drafts, in-review plans, same-tenant admin

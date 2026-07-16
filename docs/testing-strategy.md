@@ -87,6 +87,13 @@ Implemented coverage:
 - Task detail follows same-tenant `403` and cross-tenant `404` rules.
 - Task status updates validate supported statuses and append activity notes.
 - Admin membership can view and update all tasks in the active tenant.
+- Unauthenticated `/api/v1/help` returns `401`.
+- Help Centre guides are filtered to global or active-workspace visibility.
+- Teacher support requests are filtered to creator/assignee scope.
+- Support request detail follows same-tenant `403` and cross-tenant `404` rules.
+- Support request creation validates required fields and active-workspace scope.
+- Support messages append to the request conversation.
+- Support managers can view and resolve all requests in the active tenant.
 
 Cover:
 
@@ -117,29 +124,31 @@ Initial critical path is partially covered by the integration test:
 4. Class Overview.
 5. My Tasks.
 6. Task Detail.
-7. Attendance.
-8. Attendance Register.
-9. Lesson Planner.
-10. New Lesson Plan.
-11. Lesson Plan Detail.
-12. Assessments.
-13. New Assessment.
-14. Assessment Detail.
-15. Question Bank.
-16. New Question.
-17. Question Detail.
-18. Timetable.
-19. Timetable Event.
-20. Academic Calendar.
-21. Calendar Event.
-22. Resources.
-23. Resource Detail.
-24. Gradebook.
-25. Gradebook Sheet.
-26. Reports.
-27. Class Report.
-28. Approvals.
-29. Approval Detail.
+7. Help Centre.
+8. Support Request Detail.
+9. Attendance.
+10. Attendance Register.
+11. Lesson Planner.
+12. New Lesson Plan.
+13. Lesson Plan Detail.
+14. Assessments.
+15. New Assessment.
+16. Assessment Detail.
+17. Question Bank.
+18. New Question.
+19. Question Detail.
+20. Timetable.
+21. Timetable Event.
+22. Academic Calendar.
+23. Calendar Event.
+24. Resources.
+25. Resource Detail.
+26. Gradebook.
+27. Gradebook Sheet.
+28. Reports.
+29. Class Report.
+30. Approvals.
+31. Approval Detail.
 
 Future paths:
 

@@ -23,6 +23,9 @@ export const permissions = [
   "report.review",
   "approval.view",
   "approval.review",
+  "support.view",
+  "support.request",
+  "support.manage",
   "ai.use",
 ] as const;
 

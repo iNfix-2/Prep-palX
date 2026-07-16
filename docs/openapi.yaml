@@ -215,6 +215,160 @@ components:
           $ref: "#/components/schemas/TaskStatus"
         note:
           type: string
+    SupportGuideCategory:
+      type: string
+      enum: [getting_started, assessment, reports, ai, account, troubleshooting]
+    SupportRequestStatus:
+      type: string
+      enum: [open, waiting_support, waiting_teacher, resolved]
+    SupportRequestPriority:
+      type: string
+      enum: [low, medium, high]
+    SupportGuide:
+      type: object
+      required: [id, title, summary, category, readMinutes, updatedAt, tags]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        category:
+          $ref: "#/components/schemas/SupportGuideCategory"
+        readMinutes:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+        tags:
+          type: array
+          items:
+            type: string
+        href:
+          type: string
+    SupportRequest:
+      type: object
+      required: [id, workspaceId, title, summary, category, status, priority, createdByName, createdAt, updatedAt, messageCount]
+      properties:
+        id:
+          type: string
+        workspaceId:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        category:
+          $ref: "#/components/schemas/SupportGuideCategory"
+        status:
+          $ref: "#/components/schemas/SupportRequestStatus"
+        priority:
+          $ref: "#/components/schemas/SupportRequestPriority"
+        createdByName:
+          type: string
+        assignedSupportName:
+          type: string
+        sourceHref:
+          type: string
+        sourceLabel:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+        messageCount:
+          type: integer
+    SupportMessage:
+      type: object
+      required: [id, authorName, authorRole, body, createdAt]
+      properties:
+        id:
+          type: string
+        authorName:
+          type: string
+        authorRole:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    SupportRequestDetail:
+      allOf:
+        - $ref: "#/components/schemas/SupportRequest"
+        - type: object
+          required: [workspace, permissions, messages]
+          properties:
+            workspace:
+              type: object
+            permissions:
+              type: object
+              required: [canAddMessage, canManageSupport, canUseAi]
+              properties:
+                canAddMessage:
+                  type: boolean
+                canManageSupport:
+                  type: boolean
+                canUseAi:
+                  type: boolean
+            messages:
+              type: array
+              items:
+                $ref: "#/components/schemas/SupportMessage"
+    HelpCentreResponse:
+      type: object
+      required: [workspace, permissions, guides, requests]
+      properties:
+        workspace:
+          type: object
+        permissions:
+          type: object
+          required: [canCreateSupportRequest, canManageSupport, canUseAi]
+          properties:
+            canCreateSupportRequest:
+              type: boolean
+            canManageSupport:
+              type: boolean
+            canUseAi:
+              type: boolean
+        guides:
+          type: array
+          items:
+            $ref: "#/components/schemas/SupportGuide"
+        requests:
+          type: array
+          items:
+            $ref: "#/components/schemas/SupportRequest"
+    CreateSupportRequest:
+      type: object
+      required: [title, summary, category, priority]
+      properties:
+        title:
+          type: string
+        summary:
+          type: string
+        category:
+          $ref: "#/components/schemas/SupportGuideCategory"
+        priority:
+          $ref: "#/components/schemas/SupportRequestPriority"
+        sourceHref:
+          type: string
+        sourceLabel:
+          type: string
+    AddSupportMessage:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
+        status:
+          $ref: "#/components/schemas/SupportRequestStatus"
     AttendanceStatus:
       type: string
       enum: [present, absent, late, excused]
@@ -1213,6 +1367,38 @@ paths:
           description: Unauthenticated.
         "403":
           description: Missing task permission.
+  /help:
+    get:
+      summary: List support guides and visible support requests.
+      responses:
+        "200":
+          description: Help centre data.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HelpCentreResponse"
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing support permission.
+  /help/requests:
+    post:
+      summary: Open a support request in the active workspace.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupportRequest"
+      responses:
+        "201":
+          description: Created support request.
+        "400":
+          description: Invalid support request.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing support request permission.
   /teacher/attendance:
     get:
       summary: List attendance registers for accessible classes.
@@ -1460,6 +1646,53 @@ paths:
           description: Task is outside permitted scope or missing task update permission.
         "404":
           description: Task not found in active tenant.
+  /help/requests/{requestId}:
+    get:
+      summary: Get support request detail if the user has access.
+      parameters:
+        - in: path
+          name: requestId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Support request detail.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupportRequestDetail"
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Support request is outside permitted scope.
+        "404":
+          description: Support request not found in active tenant.
+    post:
+      summary: Add a support request message or manager status update.
+      parameters:
+        - in: path
+          name: requestId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddSupportMessage"
+      responses:
+        "200":
+          description: Updated support request detail.
+        "400":
+          description: Invalid support message.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Support request is outside permitted scope or missing update permission.
+        "404":
+          description: Support request not found in active tenant.
   /lesson-plans/{lessonPlanId}:
     get:
       summary: Get lesson plan detail if the user has access.

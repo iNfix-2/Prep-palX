@@ -1119,6 +1119,106 @@ test("admin membership can view and update all tasks in the active workspace", a
   assert.equal(updated.body.data.status, "done");
 });
 
+test("help centre slice scopes guides and support requests", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/help`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const help = await getJson("/api/v1/help", teacherCookie);
+  const guideIds = help.guides.map((guide) => guide.id);
+  const requestIds = help.requests.map((request) => request.id);
+
+  assert.ok(guideIds.includes("guide-create-assessment"));
+  assert.ok(guideIds.includes("guide-report-publishing"));
+  assert.ok(!guideIds.includes("guide-river-local-onboarding"));
+  assert.ok(requestIds.includes("support-gradebook-import"));
+  assert.ok(requestIds.includes("support-template-branding"));
+  assert.ok(!requestIds.includes("support-school-roster-access"));
+
+  const assignedRequest = await fetchJson(
+    "/api/v1/help/requests/support-gradebook-import",
+    teacherCookie,
+  );
+  assert.equal(assignedRequest.response.status, 200);
+  assert.equal(assignedRequest.body.data.title, "Gradebook import question");
+
+  const adminRequest = await fetchJson(
+    "/api/v1/help/requests/support-school-roster-access",
+    teacherCookie,
+  );
+  assert.equal(adminRequest.response.status, 403);
+
+  const crossTenantRequest = await fetchJson(
+    "/api/v1/help/requests/support-river-onboarding",
+    teacherCookie,
+  );
+  assert.equal(crossTenantRequest.response.status, 404);
+
+  const invalidRequest = await postJson("/api/v1/help/requests", teacherCookie, {
+    title: "Bug",
+    summary: "Too short",
+    category: "troubleshooting",
+    priority: "medium",
+  });
+  assert.equal(invalidRequest.response.status, 400);
+
+  const created = await postJson("/api/v1/help/requests", teacherCookie, {
+    title: "Question about publishing reports",
+    summary: "Please confirm whether draft comments are included in reviewer previews.",
+    category: "reports",
+    priority: "medium",
+  });
+  assert.equal(created.response.status, 201);
+  assert.equal(created.body.data.status, "open");
+  assert.equal(created.body.data.messages.length, 1);
+
+  const updated = await postJson(
+    "/api/v1/help/requests/support-gradebook-import",
+    teacherCookie,
+    { body: "I will import only score and status columns." },
+  );
+  assert.equal(updated.response.status, 200);
+  assert.equal(updated.body.data.messages.length, 3);
+
+  const helpPage = await fetch(`${baseUrl}/help`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(helpPage.status, 200);
+  assert.match(await helpPage.text(), /Gradebook import question/);
+
+  const detailPage = await fetch(`${baseUrl}/help/support-gradebook-import`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Request Conversation/);
+});
+
+test("support manager can view and resolve all support requests in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const help = await getJson("/api/v1/help", adminCookie);
+  const requestIds = help.requests.map((request) => request.id);
+
+  assert.ok(requestIds.includes("support-school-roster-access"));
+
+  const adminRequest = await fetchJson(
+    "/api/v1/help/requests/support-school-roster-access",
+    adminCookie,
+  );
+  assert.equal(adminRequest.response.status, 200);
+  assert.equal(adminRequest.body.data.createdByName, "Mr. Okafor");
+
+  const resolved = await postJson(
+    "/api/v1/help/requests/support-school-roster-access",
+    adminCookie,
+    {
+      body: "Roster access is now confirmed for the new class teacher.",
+      status: "resolved",
+    },
+  );
+  assert.equal(resolved.response.status, 200);
+  assert.equal(resolved.body.data.status, "resolved");
+});
+
 async function login(email, password) {
   const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: "POST",

@@ -73,6 +73,57 @@ export interface DemoTeacherTask {
   activities: DemoTaskActivity[];
 }
 
+export type DemoSupportGuideCategory =
+  | "getting_started"
+  | "assessment"
+  | "reports"
+  | "ai"
+  | "account"
+  | "troubleshooting";
+export type DemoSupportRequestStatus =
+  | "open"
+  | "waiting_support"
+  | "waiting_teacher"
+  | "resolved";
+export type DemoSupportRequestPriority = "low" | "medium" | "high";
+
+export interface DemoSupportGuide {
+  id: string;
+  workspaceId?: string;
+  title: string;
+  summary: string;
+  category: DemoSupportGuideCategory;
+  readMinutes: number;
+  updatedAt: string;
+  tags: string[];
+  href?: string;
+}
+
+export interface DemoSupportMessage {
+  id: string;
+  authorMembershipId: string;
+  body: string;
+  createdAt: string;
+}
+
+export interface DemoSupportRequest {
+  id: string;
+  workspaceId: string;
+  createdByMembershipId: string;
+  assignedSupportMembershipId?: string;
+  title: string;
+  summary: string;
+  category: DemoSupportGuideCategory;
+  status: DemoSupportRequestStatus;
+  priority: DemoSupportRequestPriority;
+  sourceHref?: string;
+  sourceLabel?: string;
+  createdAt: string;
+  updatedAt: string;
+  resolvedAt?: string;
+  messages: DemoSupportMessage[];
+}
+
 export interface DemoSession {
   token: string;
   userId: string;
@@ -430,6 +481,8 @@ export const demoMemberships: DemoMembership[] = [
       "gradebook.view",
       "report.prepare",
       "approval.view",
+      "support.view",
+      "support.request",
       "ai.use",
     ],
   },
@@ -465,6 +518,9 @@ export const demoMemberships: DemoMembership[] = [
       "report.review",
       "approval.view",
       "approval.review",
+      "support.view",
+      "support.request",
+      "support.manage",
       "ai.use",
     ],
   },
@@ -486,6 +542,8 @@ export const demoMemberships: DemoMembership[] = [
       "lesson.view",
       "lesson.create",
       "resource.view",
+      "support.view",
+      "support.request",
     ],
   },
 ];
@@ -893,6 +951,164 @@ export const demoTeacherTasks: DemoTeacherTask[] = [
     sourceHref: "/resources/resource-river-community-pack",
     sourceLabel: "Community Helpers Picture Cards",
     activities: [],
+  },
+];
+
+export const demoSupportGuides: DemoSupportGuide[] = [
+  {
+    id: "guide-create-assessment",
+    title: "Create and review an assessment",
+    summary: "Build a draft, attach questions, send it through review, and publish it safely.",
+    category: "assessment",
+    readMinutes: 5,
+    updatedAt: "2026-07-15T09:00:00.000Z",
+    tags: ["Assessments", "Approvals", "Gradebook"],
+    href: "/assessments/new",
+  },
+  {
+    id: "guide-ask-pal-safely",
+    title: "Use Ask Pal safely",
+    summary: "Check sources, review generated actions, and keep sensitive learner context protected.",
+    category: "ai",
+    readMinutes: 3,
+    updatedAt: "2026-07-14T11:30:00.000Z",
+    tags: ["AI", "Safety", "Review"],
+    href: "/ask-pal",
+  },
+  {
+    id: "guide-report-publishing",
+    workspaceId: "school-truth",
+    title: "Prepare report comments for review",
+    summary: "Resolve missing scores, polish comments, and submit class reports for approval.",
+    category: "reports",
+    readMinutes: 7,
+    updatedAt: "2026-07-16T08:10:00.000Z",
+    tags: ["Reports", "Comments", "Approvals"],
+    href: "/reports",
+  },
+  {
+    id: "guide-login-workspace",
+    title: "Switch workspace and reset access",
+    summary: "Understand active workspace selection, session expiry, and who to contact for access.",
+    category: "account",
+    readMinutes: 4,
+    updatedAt: "2026-07-12T10:00:00.000Z",
+    tags: ["Account", "Workspace", "Login"],
+    href: "/login",
+  },
+  {
+    id: "guide-river-local-onboarding",
+    workspaceId: "school-river",
+    title: "River Gate onboarding checklist",
+    summary: "Tenant isolation fixture for support guide visibility.",
+    category: "getting_started",
+    readMinutes: 6,
+    updatedAt: "2026-07-16T10:00:00.000Z",
+    tags: ["Onboarding"],
+  },
+];
+
+export const demoSupportRequests: DemoSupportRequest[] = [
+  {
+    id: "support-gradebook-import",
+    workspaceId: "school-truth",
+    createdByMembershipId: "mem-truth-teacher-ade",
+    assignedSupportMembershipId: "mem-truth-admin",
+    title: "Gradebook import question",
+    summary:
+      "Need help confirming whether missing score rows can be imported from the latest spreadsheet.",
+    category: "troubleshooting",
+    status: "waiting_support",
+    priority: "high",
+    sourceHref: "/gradebook/assessment-p3-comprehension",
+    sourceLabel: "Main Idea Exit Assessment gradebook",
+    createdAt: "2026-07-16T09:40:00.000Z",
+    updatedAt: "2026-07-16T10:05:00.000Z",
+    messages: [
+      {
+        id: "support-message-gradebook-import-1",
+        authorMembershipId: "mem-truth-teacher-ade",
+        body: "I have two rows pending and want to avoid overwriting existing feedback.",
+        createdAt: "2026-07-16T09:40:00.000Z",
+      },
+      {
+        id: "support-message-gradebook-import-2",
+        authorMembershipId: "mem-truth-admin",
+        body: "Keep the current feedback column and import only score/status columns.",
+        createdAt: "2026-07-16T10:05:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "support-template-branding",
+    workspaceId: "school-truth",
+    createdByMembershipId: "mem-truth-teacher-ade",
+    assignedSupportMembershipId: "mem-truth-admin",
+    title: "Template branding",
+    summary: "Report header colours looked different from the school template preview.",
+    category: "reports",
+    status: "resolved",
+    priority: "medium",
+    sourceHref: "/reports/class-p4-math",
+    sourceLabel: "Primary 4 Mathematics reports",
+    createdAt: "2026-07-15T12:10:00.000Z",
+    updatedAt: "2026-07-16T08:35:00.000Z",
+    resolvedAt: "2026-07-16T08:35:00.000Z",
+    messages: [
+      {
+        id: "support-message-template-branding-1",
+        authorMembershipId: "mem-truth-teacher-ade",
+        body: "The exported header looks darker than the preview.",
+        createdAt: "2026-07-15T12:10:00.000Z",
+      },
+      {
+        id: "support-message-template-branding-2",
+        authorMembershipId: "mem-truth-admin",
+        body: "Template branding has been refreshed and exports now match the preview.",
+        createdAt: "2026-07-16T08:35:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "support-school-roster-access",
+    workspaceId: "school-truth",
+    createdByMembershipId: "mem-truth-admin",
+    assignedSupportMembershipId: "mem-truth-admin",
+    title: "Roster access for new class teacher",
+    summary: "Admin-owned support request used to verify teacher visibility boundaries.",
+    category: "account",
+    status: "open",
+    priority: "low",
+    createdAt: "2026-07-16T07:30:00.000Z",
+    updatedAt: "2026-07-16T07:30:00.000Z",
+    messages: [
+      {
+        id: "support-message-school-roster-access-1",
+        authorMembershipId: "mem-truth-admin",
+        body: "Please confirm the new class teacher has the right roster scope.",
+        createdAt: "2026-07-16T07:30:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "support-river-onboarding",
+    workspaceId: "school-river",
+    createdByMembershipId: "mem-river-teacher",
+    title: "River onboarding support",
+    summary: "Tenant isolation fixture for support request scope checks.",
+    category: "getting_started",
+    status: "open",
+    priority: "medium",
+    createdAt: "2026-07-16T10:20:00.000Z",
+    updatedAt: "2026-07-16T10:20:00.000Z",
+    messages: [
+      {
+        id: "support-message-river-onboarding-1",
+        authorMembershipId: "mem-river-teacher",
+        body: "Tenant isolation fixture.",
+        createdAt: "2026-07-16T10:20:00.000Z",
+      },
+    ],
   },
 ];
 
@@ -1976,6 +2192,77 @@ export function getResource(resourceId: string) {
 
 export function getTeacherTask(taskId: string) {
   return demoTeacherTasks.find((task) => task.id === taskId) ?? null;
+}
+
+export function getSupportRequest(requestId: string) {
+  return demoSupportRequests.find((request) => request.id === requestId) ?? null;
+}
+
+export function createDemoSupportRequest(input: {
+  workspaceId: string;
+  createdByMembershipId: string;
+  title: string;
+  summary: string;
+  category: DemoSupportGuideCategory;
+  priority: DemoSupportRequestPriority;
+  sourceHref?: string;
+  sourceLabel?: string;
+}) {
+  const now = new Date().toISOString();
+  const id = `support-request-${demoSupportRequests.length + 1}`;
+  const request: DemoSupportRequest = {
+    id,
+    workspaceId: input.workspaceId,
+    createdByMembershipId: input.createdByMembershipId,
+    title: input.title,
+    summary: input.summary,
+    category: input.category,
+    status: "open",
+    priority: input.priority,
+    sourceHref: input.sourceHref,
+    sourceLabel: input.sourceLabel,
+    createdAt: now,
+    updatedAt: now,
+    messages: [
+      {
+        id: `support-message-${id}-1`,
+        authorMembershipId: input.createdByMembershipId,
+        body: input.summary,
+        createdAt: now,
+      },
+    ],
+  };
+
+  demoSupportRequests.push(request);
+  return request;
+}
+
+export function addDemoSupportMessage(
+  requestId: string,
+  input: {
+    authorMembershipId: string;
+    body: string;
+    status?: DemoSupportRequestStatus;
+  },
+) {
+  const request = getSupportRequest(requestId);
+
+  if (!request) {
+    return null;
+  }
+
+  const now = new Date().toISOString();
+  request.messages.push({
+    id: `support-message-${request.id}-${request.messages.length + 1}`,
+    authorMembershipId: input.authorMembershipId,
+    body: input.body,
+    createdAt: now,
+  });
+  request.status = input.status ?? request.status;
+  request.updatedAt = now;
+  request.resolvedAt = request.status === "resolved" ? now : undefined;
+
+  return request;
 }
 
 export function updateDemoTeacherTaskStatus(

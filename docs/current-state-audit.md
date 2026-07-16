@@ -76,6 +76,8 @@ UI routes:
 - `/classes/[classId]` via `src/app/(teacher)/classes/[classId]/page.tsx`
 - `/my-tasks` via `src/app/(teacher)/my-tasks/page.tsx`
 - `/my-tasks/[taskId]` via `src/app/(teacher)/my-tasks/[taskId]/page.tsx`
+- `/help` via `src/app/(teacher)/help/page.tsx`
+- `/help/[requestId]` via `src/app/(teacher)/help/[requestId]/page.tsx`
 - `/attendance` via `src/app/(teacher)/attendance/page.tsx`
 - `/attendance/[classId]` via `src/app/(teacher)/attendance/[classId]/page.tsx`
 - `/lesson-planner` via `src/app/(teacher)/lesson-planner/page.tsx`
@@ -118,6 +120,9 @@ First-slice API routes:
 - `/api/v1/me`
 - `/api/v1/workspaces`
 - `/api/v1/workspaces/select`
+- `/api/v1/help`
+- `/api/v1/help/requests`
+- `/api/v1/help/requests/[requestId]`
 - `/api/v1/teacher/tasks`
 - `/api/v1/tasks/[taskId]`
 - `/api/v1/teacher/classes`
@@ -156,6 +161,7 @@ The current repo contains a scaffolded subset of the larger Stitch design:
 - Dynamic builder renderer for lesson and assessment draft flows.
 - First-slice My Classes and Class Overview screens.
 - My Tasks and Task Detail demo slice.
+- Help Centre and Support Request Detail demo slice.
 - Attendance and Attendance Register demo slice.
 - Lesson Planner, New Lesson Plan, and Lesson Plan Detail demo slice.
 - Assessments, New Assessment, and Assessment Detail demo slice.
@@ -171,7 +177,7 @@ The broader 88-screen Stitch design is not present as discrete source files in t
 
 ## 7. Existing API Calls
 
-No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The tasks, class, attendance, lesson-planner, assessment, question-bank, timetable, academic-calendar, resources, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/tasks-service.ts`, `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`, `src/lib/server/academic-calendar-service.ts`, `src/lib/server/resources-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
+No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The tasks, help/support, class, attendance, lesson-planner, assessment, question-bank, timetable, academic-calendar, resources, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/tasks-service.ts`, `src/lib/server/help-service.ts`, `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`, `src/lib/server/academic-calendar-service.ts`, `src/lib/server/resources-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
 
 ## 8. Existing Mock Services and Mock Data
 
