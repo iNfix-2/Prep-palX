@@ -86,6 +86,8 @@ UI routes:
 - `/gradebook/[assessmentId]` via `src/app/(teacher)/gradebook/[assessmentId]/page.tsx`
 - `/reports` via `src/app/(teacher)/reports/page.tsx`
 - `/reports/[classId]` via `src/app/(teacher)/reports/[classId]/page.tsx`
+- `/approvals` via `src/app/(teacher)/approvals/page.tsx`
+- `/approvals/[approvalId]` via `src/app/(teacher)/approvals/[approvalId]/page.tsx`
 - `/ask-pal` via `src/app/ask-pal/page.tsx`
 - `/:section` via `src/app/(teacher)/[section]/page.tsx`
 - `/:section/new` via `src/app/(teacher)/[section]/new/page.tsx`
@@ -119,6 +121,8 @@ First-slice API routes:
 - `/api/v1/gradebooks/[assessmentId]`
 - `/api/v1/teacher/reports`
 - `/api/v1/reports/[classId]`
+- `/api/v1/teacher/approvals`
+- `/api/v1/approvals/[approvalId]`
 
 ## 6. Existing Page and Screen Structure
 
@@ -134,12 +138,13 @@ The current repo contains a scaffolded subset of the larger Stitch design:
 - Assessments, New Assessment, and Assessment Detail demo slice.
 - Gradebook and Gradebook Sheet demo slice.
 - Reports and Class Report demo slice.
+- Approvals and Approval Detail demo slice.
 
 The broader 88-screen Stitch design is not present as discrete source files in this repository. The implemented app uses consolidated renderers and typed mock configuration instead of one component per Stitch screen.
 
 ## 7. Existing API Calls
 
-No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class, attendance, lesson-planner, assessment, gradebook, and reports slices use server components/actions calling `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/gradebook-service.ts`, and `src/lib/server/reports-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
+No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class, attendance, lesson-planner, assessment, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
 
 ## 8. Existing Mock Services and Mock Data
 
@@ -180,6 +185,7 @@ Lesson planning adds `lesson.view` and uses `lesson.create`.
 Assessment creation and detail use `assessment.view` and `assessment.create`.
 Gradebook uses `gradebook.view` and `assessment.mark`.
 Reports use `report.prepare` and `report.review`.
+Approvals use `approval.view`, `approval.review`, and reviewer-compatible `report.review`.
 
 ## 11. Existing State Management
 
@@ -195,7 +201,7 @@ No database models, migrations, seed files, or schema tooling are present.
 
 ## 14. Existing Tests
 
-`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, attendance register filtering and save, lesson plan filtering and create, assessment filtering and create, gradebook filtering and score save, report filtering and comment save, admin access, `403` for same-tenant unassigned access, and `404` for cross-tenant access.
+`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, attendance register filtering and save, lesson plan filtering and create, assessment filtering and create, gradebook filtering and score save, report filtering and comment save, approval filtering and reviewer decisions, admin access, `403` for same-tenant unassigned access, and `404` for cross-tenant access.
 
 ## 15. Existing Deployment Configuration
 
@@ -250,7 +256,7 @@ Reusable candidates:
 ## 21. Screens with Partial Backend Integration
 
 Integrated demo route handlers exist for classes, attendance, lesson planning,
-assessments, gradebook, and reports. No screen is integrated with a real
+assessments, gradebook, reports, and approvals. No screen is integrated with a real
 backend or database.
 
 ## 22. Missing Infrastructure Required Before Integration

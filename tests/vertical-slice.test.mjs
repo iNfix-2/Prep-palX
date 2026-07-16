@@ -614,6 +614,102 @@ test("admin membership can view all reports in the active workspace", async () =
   assert.equal(scienceReport.body.data.classDisplayName, "Primary 5 Basic Science");
 });
 
+test("approvals slice tracks review requests with teacher and reviewer scope", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/approvals`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const approvals = await getJson("/api/v1/teacher/approvals", teacherCookie);
+  const approvalIds = approvals.approvals.map((approval) => approval.id);
+
+  assert.ok(approvalIds.includes("approval-lesson-p3-reading"));
+  assert.ok(approvalIds.includes("approval-assessment-p3-comprehension"));
+  assert.ok(approvalIds.includes("approval-report-p4-math"));
+  assert.ok(!approvalIds.includes("approval-lesson-p5-evaporation"));
+
+  const assignedApproval = await fetchJson(
+    "/api/v1/approvals/approval-assessment-p3-comprehension",
+    teacherCookie,
+  );
+  assert.equal(assignedApproval.response.status, 200);
+  assert.equal(assignedApproval.body.data.title, "Main Idea Exit Assessment");
+
+  const unassignedApproval = await fetchJson(
+    "/api/v1/approvals/approval-lesson-p5-evaporation",
+    teacherCookie,
+  );
+  assert.equal(unassignedApproval.response.status, 403);
+
+  const crossTenantApproval = await fetchJson(
+    "/api/v1/approvals/approval-assessment-river-community",
+    teacherCookie,
+  );
+  assert.equal(crossTenantApproval.response.status, 404);
+
+  const teacherDecision = await postJson(
+    "/api/v1/approvals/approval-assessment-p3-comprehension",
+    teacherCookie,
+    { action: "approve" },
+  );
+  assert.equal(teacherDecision.response.status, 403);
+
+  const approvalsPage = await fetch(`${baseUrl}/approvals`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(approvalsPage.status, 200);
+  assert.match(await approvalsPage.text(), /Main Idea Exit Assessment/);
+
+  const detailPage = await fetch(`${baseUrl}/approvals/approval-report-p4-math`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Review Thread/);
+});
+
+test("admin membership can review approvals in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const approvals = await getJson("/api/v1/teacher/approvals", adminCookie);
+  const approvalIds = approvals.approvals.map((approval) => approval.id);
+
+  assert.ok(approvalIds.includes("approval-lesson-p5-evaporation"));
+
+  const invalidDecision = await postJson(
+    "/api/v1/approvals/approval-assessment-p3-comprehension",
+    adminCookie,
+    { action: "request_changes" },
+  );
+  assert.equal(invalidDecision.response.status, 400);
+
+  const changesRequested = await postJson(
+    "/api/v1/approvals/approval-assessment-p3-comprehension",
+    adminCookie,
+    {
+      action: "request_changes",
+      note: "Clarify the vocabulary support instructions before publishing.",
+    },
+  );
+  assert.equal(changesRequested.response.status, 200);
+  assert.equal(changesRequested.body.data.status, "changes_requested");
+  assert.equal(changesRequested.body.data.notes.length, 1);
+
+  const approved = await postJson(
+    "/api/v1/approvals/approval-lesson-p3-reading",
+    adminCookie,
+    { action: "approve", note: "Ready for the reading block." },
+  );
+  assert.equal(approved.response.status, 200);
+  assert.equal(approved.body.data.status, "approved");
+
+  const lessonPlan = await getJson("/api/v1/lesson-plans/lesson-p3-reading", adminCookie);
+  assert.equal(lessonPlan.status, "approved");
+
+  const adminDetailPage = await fetch(`${baseUrl}/approvals/approval-lesson-p3-reading`, {
+    headers: { cookie: adminCookie },
+  });
+  assert.equal(adminDetailPage.status, 200);
+  assert.match(await adminDetailPage.text(), /Reviewer Decision/);
+});
+
 async function login(email, password) {
   const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: "POST",

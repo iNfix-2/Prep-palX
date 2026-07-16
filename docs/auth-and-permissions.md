@@ -84,6 +84,8 @@ Preferred production approach:
 - `report.prepare`
 - `report.review`
 - `report.publish`
+- `approval.view`
+- `approval.review`
 - `school.settings.manage`
 - `staff.manage`
 - `timetable.manage`

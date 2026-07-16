@@ -144,6 +144,35 @@ export interface DemoReportComment {
   updatedAt: string;
 }
 
+export type DemoApprovalResourceType = "lesson_plan" | "assessment" | "report";
+export type DemoApprovalStatus = "pending" | "changes_requested" | "approved";
+export type DemoApprovalPriority = "low" | "medium" | "high";
+
+export interface DemoApprovalNote {
+  id: string;
+  authorMembershipId: string;
+  body: string;
+  createdAt: string;
+}
+
+export interface DemoApprovalRequest {
+  id: string;
+  workspaceId: string;
+  classId: string;
+  resourceType: DemoApprovalResourceType;
+  resourceId: string;
+  title: string;
+  summary: string;
+  status: DemoApprovalStatus;
+  priority: DemoApprovalPriority;
+  submittedByMembershipId: string;
+  reviewerMembershipId?: string;
+  submittedAt: string;
+  dueDate: string;
+  updatedAt: string;
+  notes: DemoApprovalNote[];
+}
+
 export interface DemoClassTask {
   id: string;
   title: string;
@@ -245,6 +274,7 @@ export const demoMemberships: DemoMembership[] = [
       "assessment.mark",
       "gradebook.view",
       "report.prepare",
+      "approval.view",
       "ai.use",
     ],
   },
@@ -270,6 +300,8 @@ export const demoMemberships: DemoMembership[] = [
       "gradebook.view",
       "report.prepare",
       "report.review",
+      "approval.view",
+      "approval.review",
       "ai.use",
     ],
   },
@@ -988,6 +1020,107 @@ export const demoReportComments: DemoReportComment[] = [
   },
 ];
 
+export const demoApprovalRequests: DemoApprovalRequest[] = [
+  {
+    id: "approval-lesson-p3-reading",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    resourceType: "lesson_plan",
+    resourceId: "lesson-p3-reading",
+    title: "Main Idea in Short Passages",
+    summary: "Lesson plan review for evidence-focused reading comprehension.",
+    status: "pending",
+    priority: "medium",
+    submittedByMembershipId: "mem-truth-teacher-ade",
+    reviewerMembershipId: "mem-truth-admin",
+    submittedAt: "2026-07-16T11:20:00.000Z",
+    dueDate: "2026-07-18",
+    updatedAt: "2026-07-16T11:20:00.000Z",
+    notes: [],
+  },
+  {
+    id: "approval-assessment-p3-comprehension",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    resourceType: "assessment",
+    resourceId: "assessment-p3-comprehension",
+    title: "Main Idea Exit Assessment",
+    summary: "Assessment moderation request before publishing to the gradebook.",
+    status: "pending",
+    priority: "high",
+    submittedByMembershipId: "mem-truth-teacher-ade",
+    reviewerMembershipId: "mem-truth-admin",
+    submittedAt: "2026-07-16T13:00:00.000Z",
+    dueDate: "2026-07-23",
+    updatedAt: "2026-07-16T13:00:00.000Z",
+    notes: [],
+  },
+  {
+    id: "approval-report-p4-math",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    resourceType: "report",
+    resourceId: "class-p4-math",
+    title: "Primary 4 Mathematics Reports",
+    summary: "Report comments need final evidence checks before family delivery.",
+    status: "changes_requested",
+    priority: "high",
+    submittedByMembershipId: "mem-truth-teacher-ade",
+    reviewerMembershipId: "mem-truth-admin",
+    submittedAt: "2026-07-16T14:30:00.000Z",
+    dueDate: "2026-07-26",
+    updatedAt: "2026-07-16T15:00:00.000Z",
+    notes: [
+      {
+        id: "approval-note-report-p4-math-1",
+        authorMembershipId: "mem-truth-admin",
+        body: "Resolve Kene's missing quick-check score before approving final reports.",
+        createdAt: "2026-07-16T15:00:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "approval-lesson-p5-evaporation",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    resourceType: "lesson_plan",
+    resourceId: "lesson-p5-evaporation",
+    title: "Evaporation Practical",
+    summary: "Admin-owned science practical already approved for teaching.",
+    status: "approved",
+    priority: "low",
+    submittedByMembershipId: "mem-truth-admin",
+    reviewerMembershipId: "mem-truth-admin",
+    submittedAt: "2026-07-15T13:00:00.000Z",
+    dueDate: "2026-07-20",
+    updatedAt: "2026-07-15T13:30:00.000Z",
+    notes: [
+      {
+        id: "approval-note-lesson-p5-evaporation-1",
+        authorMembershipId: "mem-truth-admin",
+        body: "Approved with lab safety checklist attached to the lesson plan.",
+        createdAt: "2026-07-15T13:30:00.000Z",
+      },
+    ],
+  },
+  {
+    id: "approval-assessment-river-community",
+    workspaceId: "school-river",
+    classId: "class-river-history",
+    resourceType: "assessment",
+    resourceId: "assessment-river-community",
+    title: "Community Helpers Check",
+    summary: "Tenant isolation fixture.",
+    status: "pending",
+    priority: "medium",
+    submittedByMembershipId: "mem-river-teacher",
+    submittedAt: "2026-07-16T10:45:00.000Z",
+    dueDate: "2026-07-22",
+    updatedAt: "2026-07-16T10:45:00.000Z",
+    notes: [],
+  },
+];
+
 export function findDemoUserBySession(token: string | undefined) {
   const session = demoSessions.find((item) => item.token === token);
   return session ? demoUsers.find((user) => user.id === session.userId) ?? null : null;
@@ -1050,6 +1183,10 @@ export function getGradebookScoresForAssessment(assessmentId: string) {
 
 export function getReportCommentsForClass(classId: string) {
   return demoReportComments.filter((record) => record.classId === classId);
+}
+
+export function getApprovalRequest(approvalId: string) {
+  return demoApprovalRequests.find((request) => request.id === approvalId) ?? null;
 }
 
 export function upsertDemoAttendanceRecords(
@@ -1166,6 +1303,53 @@ export function upsertDemoReportComments(
       updatedAt,
     });
   }
+}
+
+export function updateDemoApprovalRequest(
+  approvalId: string,
+  update: {
+    status: DemoApprovalStatus;
+    reviewerMembershipId: string;
+    note?: string;
+  },
+) {
+  const approval = getApprovalRequest(approvalId);
+
+  if (!approval) {
+    return null;
+  }
+
+  const updatedAt = new Date().toISOString();
+  approval.status = update.status;
+  approval.reviewerMembershipId = update.reviewerMembershipId;
+  approval.updatedAt = updatedAt;
+
+  if (update.note?.trim()) {
+    approval.notes.push({
+      id: `approval-note-${approval.id}-${approval.notes.length + 1}`,
+      authorMembershipId: update.reviewerMembershipId,
+      body: update.note.trim(),
+      createdAt: updatedAt,
+    });
+  }
+
+  if (approval.resourceType === "lesson_plan") {
+    const lessonPlan = demoLessonPlans.find((plan) => plan.id === approval.resourceId);
+    if (lessonPlan) {
+      lessonPlan.status = update.status === "approved" ? "approved" : "draft";
+      lessonPlan.updatedAt = updatedAt;
+    }
+  }
+
+  if (approval.resourceType === "assessment") {
+    const assessment = demoAssessments.find((item) => item.id === approval.resourceId);
+    if (assessment) {
+      assessment.status = update.status === "approved" ? "published" : "draft";
+      assessment.updatedAt = updatedAt;
+    }
+  }
+
+  return approval;
 }
 
 export function createDemoLessonPlan(

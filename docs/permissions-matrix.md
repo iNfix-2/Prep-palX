@@ -5,9 +5,9 @@ This matrix is the initial permission model. It must be enforced server-side bef
 | Role | Core Permissions | Screens | API Operations | Sensitive Fields | Tenant Boundary |
 | --- | --- | --- | --- | --- | --- |
 | Platform administrator | platform-wide support/admin permissions | Support admin, audit tools | platform support endpoints | cross-tenant metadata | Must be explicitly scoped and audited |
-| School administrator | `school.settings.manage`, `staff.manage`, `class.manage`, `attendance.record`, `attendance.view_reports`, `lesson.view`, `lesson.create`, `assessment.view`, `assessment.create`, `assessment.mark`, `gradebook.view`, `timetable.manage`, `report.review`, `audit.view` | Admin/settings/staff/classes/reports | school management APIs | staff/learner PII, attendance, lesson notes, assessment content, scores, audit logs | Own school only |
-| Teacher | `class.view_assigned`, `lesson.view`, `lesson.create`, `attendance.record`, `attendance.view_reports`, `assessment.view`, `assessment.create`, `assessment.mark`, `gradebook.view`, `report.prepare`, `ai.use` | Teacher dashboard, classes, lesson planner, attendance, assessments, gradebook, reports, Ask Pal | teacher class APIs, lesson plan APIs, attendance APIs, assessment APIs, gradebook APIs | learner scores, attendance, lesson notes, assessment content, comments | Assigned classes unless broader permission |
-| Reviewer | `assessment.moderate`, `assessment.approve`, `report.review`, `ai.approve_action` | Approvals, assessments, reports | approval/review APIs | assessment content, report comments | Assigned school/review scope |
+| School administrator | `school.settings.manage`, `staff.manage`, `class.manage`, `attendance.record`, `attendance.view_reports`, `lesson.view`, `lesson.create`, `assessment.view`, `assessment.create`, `assessment.mark`, `gradebook.view`, `timetable.manage`, `report.review`, `approval.view`, `approval.review`, `audit.view` | Admin/settings/staff/classes/reports/approvals | school management APIs | staff/learner PII, attendance, lesson notes, assessment content, scores, audit logs | Own school only |
+| Teacher | `class.view_assigned`, `lesson.view`, `lesson.create`, `attendance.record`, `attendance.view_reports`, `assessment.view`, `assessment.create`, `assessment.mark`, `gradebook.view`, `report.prepare`, `approval.view`, `ai.use` | Teacher dashboard, classes, lesson planner, attendance, assessments, gradebook, reports, approvals, Ask Pal | teacher class APIs, lesson plan APIs, attendance APIs, assessment APIs, gradebook APIs, approval tracking APIs | learner scores, attendance, lesson notes, assessment content, comments | Assigned classes unless broader permission |
+| Reviewer | `approval.view`, `approval.review`, `assessment.moderate`, `assessment.approve`, `report.review`, `ai.approve_action` | Approvals, assessments, reports | approval/review APIs | assessment content, report comments | Assigned school/review scope |
 | Support administrator | `support.manage` | Help/support admin | support ticket APIs | ticket metadata | Assigned support scope |
 | Parent/guardian | `learner.view_guardian_scope` proposed | Guardian portal future | guardian learner APIs | own learner records only | Linked learner only |
 | Learner | `learner.view_self` proposed | Learner portal future | learner self APIs | own records only | Own membership only |
@@ -33,7 +33,8 @@ This matrix is the initial permission model. It must be enforced server-side bef
 | `/attendance/[classId]` | `attendance.record` scoped to assigned class or `class.manage` |
 | `/reports` | `report.prepare` or `report.review` |
 | `/reports/[classId]` | `report.prepare` or `report.review` scoped to assigned class or `class.manage` |
-| `/approvals` | `assessment.moderate` or `report.review` |
+| `/approvals` | `approval.view` or `approval.review` |
+| `/approvals/[approvalId]` | `approval.view` or `approval.review`; decisions require `approval.review` or `report.review` |
 | `/ask-pal` | `ai.use` |
 | `/settings` | `account.manage_self` |
 

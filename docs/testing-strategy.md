@@ -57,6 +57,12 @@ Implemented coverage:
 - Class report detail follows same-tenant `403` and cross-tenant `404` rules.
 - Report comment save validates learner IDs, ready comments, and assigned-class scope.
 - Admin membership can view all reports in the active tenant.
+- Unauthenticated `/api/v1/teacher/approvals` returns `401`.
+- Teacher approval tracking is filtered to submitted or assigned-class requests.
+- Approval detail follows same-tenant `403` and cross-tenant `404` rules.
+- Teachers cannot submit reviewer decisions without reviewer permission.
+- Reviewer decisions validate required change notes and update linked workflow state.
+- Admin membership can review all approvals in the active tenant.
 
 Cover:
 
@@ -97,10 +103,13 @@ Initial critical path is partially covered by the integration test:
 14. Gradebook Sheet.
 15. Reports.
 16. Class Report.
+17. Approvals.
+18. Approval Detail.
 
 Future paths:
 
 - Report template review and publication.
+- Workflow assignment, audit exports, and reviewer load balancing.
 
 ## Security Tests
 

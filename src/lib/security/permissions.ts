@@ -13,6 +13,8 @@ export const permissions = [
   "gradebook.view",
   "report.prepare",
   "report.review",
+  "approval.view",
+  "approval.review",
   "ai.use",
 ] as const;
 

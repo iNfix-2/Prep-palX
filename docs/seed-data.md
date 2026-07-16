@@ -26,6 +26,9 @@ fixtures in `src/lib/server/demo-store.ts`.
   scores, and a cross-tenant score fixture.
 - Report comments cover ready and draft learner comments for assigned classes,
   a same-tenant admin class, and a cross-tenant fixture.
+- Approval requests cover pending, changes-requested, and approved workflow states
+  for lesson plans, assessments, reports, same-tenant admin-owned items, and a
+  cross-tenant fixture.
 
 Required seed scenarios:
 
