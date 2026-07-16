@@ -47,6 +47,11 @@ Implemented coverage:
 - Assessment detail follows same-tenant `403` and cross-tenant `404` rules.
 - Assessment creation validates required fields, mark totals, and assigned-class scope.
 - Admin membership can view all assessments in the active tenant.
+- Unauthenticated `/api/v1/teacher/questions` returns `401`.
+- Teacher question bank items are filtered to assigned classes.
+- Question detail follows same-tenant `403` and cross-tenant `404` rules.
+- Question creation validates required fields, multiple-choice options, and assigned-class scope.
+- Admin membership can view all questions in the active tenant.
 - Unauthenticated `/api/v1/teacher/gradebooks` returns `401`.
 - Teacher gradebook sheets are filtered to assigned classes.
 - Gradebook sheet detail follows same-tenant `403` and cross-tenant `404` rules.
@@ -99,12 +104,15 @@ Initial critical path is partially covered by the integration test:
 10. Assessments.
 11. New Assessment.
 12. Assessment Detail.
-13. Gradebook.
-14. Gradebook Sheet.
-15. Reports.
-16. Class Report.
-17. Approvals.
-18. Approval Detail.
+13. Question Bank.
+14. New Question.
+15. Question Detail.
+16. Gradebook.
+17. Gradebook Sheet.
+18. Reports.
+19. Class Report.
+20. Approvals.
+21. Approval Detail.
 
 Future paths:
 

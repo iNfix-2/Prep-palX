@@ -50,9 +50,9 @@ Objective: assessment creation, marking, moderation, gradebook.
 Dependencies: Phase A-C.
 
 Complexity: extra-large. Status: assessment list, draft creation, assessment
-detail, gradebook list, and score-entry demo slices are implemented with
-in-memory seed data. Moderation, question bank integration, report calculations,
-and production persistence are not started.
+detail, question bank list/create/detail, gradebook list, and score-entry demo
+slices are implemented with in-memory seed data. Question search/import/reuse,
+report calculations, and production persistence are not started.
 Approval queue demo handling now covers basic moderation decisions for submitted
 assessments and lesson plans; richer reviewer assignment, rubric checks, and
 production audit remain outstanding.
@@ -106,4 +106,5 @@ Replace `src/lib/server/demo-store.ts` with a real database repository layer whi
 preserving the service boundaries in `src/lib/server/classes-service.ts` and
 `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`,
 `src/lib/server/assessments-service.ts`, `src/lib/server/gradebook-service.ts`,
-`src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`.
+`src/lib/server/question-bank-service.ts`, `src/lib/server/reports-service.ts`,
+and `src/lib/server/approvals-service.ts`.

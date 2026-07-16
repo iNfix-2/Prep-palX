@@ -113,6 +113,30 @@ export interface DemoAssessment {
   updatedAt: string;
 }
 
+export type DemoQuestionStatus = "draft" | "in_review" | "approved";
+export type DemoQuestionDifficulty = "easy" | "medium" | "hard";
+export type DemoQuestionType = "multiple_choice" | "short_answer" | "structured_response";
+
+export interface DemoQuestion {
+  id: string;
+  workspaceId: string;
+  classId: string;
+  prompt: string;
+  type: DemoQuestionType;
+  difficulty: DemoQuestionDifficulty;
+  status: DemoQuestionStatus;
+  marks: number;
+  topic: string;
+  skill: string;
+  options: string[];
+  answer: string;
+  explanation: string;
+  usageCount: number;
+  qualityPercent: number;
+  createdByMembershipId: string;
+  updatedAt: string;
+}
+
 export type DemoGradebookScoreStatus = "scored" | "missing" | "excused";
 
 export interface DemoGradebookScore {
@@ -272,6 +296,8 @@ export const demoMemberships: DemoMembership[] = [
       "assessment.view",
       "assessment.create",
       "assessment.mark",
+      "question.view",
+      "question.manage",
       "gradebook.view",
       "report.prepare",
       "approval.view",
@@ -297,6 +323,8 @@ export const demoMemberships: DemoMembership[] = [
       "assessment.view",
       "assessment.create",
       "assessment.mark",
+      "question.view",
+      "question.manage",
       "gradebook.view",
       "report.prepare",
       "report.review",
@@ -859,6 +887,89 @@ export const demoAssessments: DemoAssessment[] = [
   },
 ];
 
+export const demoQuestions: DemoQuestion[] = [
+  {
+    id: "question-p4-equivalent-fractions",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    prompt: "Which fraction is equivalent to 1/2 when shown with equal-sized fraction strips?",
+    type: "multiple_choice",
+    difficulty: "medium",
+    status: "approved",
+    marks: 4,
+    topic: "Equivalent fractions",
+    skill: "Representation",
+    options: ["1/4", "2/4", "3/4", "4/4"],
+    answer: "2/4",
+    explanation:
+      "Two out of four equal parts cover the same amount as one out of two equal parts.",
+    usageCount: 3,
+    qualityPercent: 96,
+    createdByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T12:20:00.000Z",
+  },
+  {
+    id: "question-p3-main-idea",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    prompt: "Read the short passage and write one sentence that states its main idea.",
+    type: "short_answer",
+    difficulty: "medium",
+    status: "in_review",
+    marks: 5,
+    topic: "Main idea",
+    skill: "Comprehension",
+    options: [],
+    answer: "A clear sentence that tells what the passage is mostly about.",
+    explanation:
+      "The response should name the central idea and avoid listing only one small detail.",
+    usageCount: 1,
+    qualityPercent: 88,
+    createdByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T11:55:00.000Z",
+  },
+  {
+    id: "question-p5-evaporation",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    prompt: "Explain why water left in a shallow tray may disappear faster on a sunny day.",
+    type: "structured_response",
+    difficulty: "hard",
+    status: "approved",
+    marks: 6,
+    topic: "Evaporation",
+    skill: "Scientific explanation",
+    options: [],
+    answer:
+      "Heat from the sun gives water particles more energy, so more particles escape into the air as water vapour.",
+    explanation:
+      "A strong answer links heat, particle energy, and change from liquid water to vapour.",
+    usageCount: 2,
+    qualityPercent: 94,
+    createdByMembershipId: "mem-truth-admin",
+    updatedAt: "2026-07-15T15:45:00.000Z",
+  },
+  {
+    id: "question-river-community",
+    workspaceId: "school-river",
+    classId: "class-river-history",
+    prompt: "Name one community helper and describe how that person supports families.",
+    type: "short_answer",
+    difficulty: "easy",
+    status: "draft",
+    marks: 3,
+    topic: "Community helpers",
+    skill: "Recall",
+    options: [],
+    answer: "Example: a nurse helps families by treating sick people.",
+    explanation: "Tenant isolation fixture for question-bank scope checks.",
+    usageCount: 0,
+    qualityPercent: 72,
+    createdByMembershipId: "mem-river-teacher",
+    updatedAt: "2026-07-16T10:40:00.000Z",
+  },
+];
+
 export const demoGradebookScores: DemoGradebookScore[] = [
   {
     id: "score-p4-fractions-ada",
@@ -1189,6 +1300,10 @@ export function getApprovalRequest(approvalId: string) {
   return demoApprovalRequests.find((request) => request.id === approvalId) ?? null;
 }
 
+export function getQuestion(questionId: string) {
+  return demoQuestions.find((question) => question.id === questionId) ?? null;
+}
+
 export function upsertDemoAttendanceRecords(
   records: Array<{
     workspaceId: string;
@@ -1388,6 +1503,24 @@ export function createDemoAssessment(
   return assessment;
 }
 
+export function createDemoQuestion(
+  input: Omit<DemoQuestion, "id" | "updatedAt" | "qualityPercent" | "usageCount"> & {
+    qualityPercent?: number;
+    usageCount?: number;
+  },
+) {
+  const question: DemoQuestion = {
+    ...input,
+    id: `question-${demoQuestions.length + 1}`,
+    usageCount: input.usageCount ?? 0,
+    qualityPercent: input.qualityPercent ?? calculateQuestionQuality(input),
+    updatedAt: new Date().toISOString(),
+  };
+
+  demoQuestions.push(question);
+  return question;
+}
+
 function calculateLessonReadiness(input: {
   objectives: string[];
   materials: string[];
@@ -1433,6 +1566,33 @@ function calculateAssessmentReadiness(input: {
     input.instructions.length > 0,
     input.items.length > 0,
     input.reviewNotes.length > 0,
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
+
+function calculateQuestionQuality(input: {
+  prompt: string;
+  type: DemoQuestionType;
+  difficulty: DemoQuestionDifficulty;
+  status: DemoQuestionStatus;
+  marks: number;
+  topic: string;
+  skill: string;
+  options: string[];
+  answer: string;
+  explanation: string;
+}) {
+  const checks = [
+    input.prompt.length >= 10,
+    input.type.length > 0,
+    input.difficulty.length > 0,
+    input.status.length > 0,
+    input.marks > 0,
+    input.topic.length > 0,
+    input.skill.length > 0,
+    input.type !== "multiple_choice" || input.options.length >= 2,
+    input.answer.length > 0,
+    input.explanation.length > 0,
   ];
   return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }

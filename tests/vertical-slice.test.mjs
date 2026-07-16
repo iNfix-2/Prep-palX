@@ -415,6 +415,123 @@ test("admin membership can view all assessments in the active workspace", async 
   assert.equal(scienceAssessment.body.data.title, "Matter and Change Practical Evidence");
 });
 
+test("question bank slice creates and scopes reusable questions", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/questions`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const questions = await getJson("/api/v1/teacher/questions", teacherCookie);
+  const questionIds = questions.questions.map((question) => question.id);
+  assert.deepEqual(questionIds, ["question-p4-equivalent-fractions", "question-p3-main-idea"]);
+
+  const assignedQuestion = await fetchJson(
+    "/api/v1/questions/question-p4-equivalent-fractions",
+    teacherCookie,
+  );
+  assert.equal(assignedQuestion.response.status, 200);
+  assert.match(assignedQuestion.body.data.prompt, /equivalent to 1\/2/);
+
+  const unassignedQuestion = await fetchJson(
+    "/api/v1/questions/question-p5-evaporation",
+    teacherCookie,
+  );
+  assert.equal(unassignedQuestion.response.status, 403);
+
+  const crossTenantQuestion = await fetchJson(
+    "/api/v1/questions/question-river-community",
+    teacherCookie,
+  );
+  assert.equal(crossTenantQuestion.response.status, 404);
+
+  const invalidDraft = await postJson("/api/v1/questions", teacherCookie, {
+    classId: "class-p4-math",
+    prompt: "",
+    type: "multiple_choice",
+    difficulty: "medium",
+    status: "draft",
+    marks: 4,
+    topic: "Equivalent fractions",
+    skill: "Representation",
+    options: ["1/4"],
+    answer: "",
+    explanation: "Missing answer and options.",
+  });
+  assert.equal(invalidDraft.response.status, 400);
+
+  const unassignedDraft = await postJson("/api/v1/questions", teacherCookie, {
+    classId: "class-p5-science",
+    prompt: "Explain why water changes state faster when heat is added.",
+    type: "structured_response",
+    difficulty: "hard",
+    status: "draft",
+    marks: 6,
+    topic: "Evaporation",
+    skill: "Scientific explanation",
+    options: [],
+    answer: "Heat increases particle energy.",
+    explanation: "Outside assigned teaching scope.",
+  });
+  assert.equal(unassignedDraft.response.status, 403);
+
+  const created = await postJson("/api/v1/questions", teacherCookie, {
+    classId: "class-p3-english",
+    prompt: "Which sentence best states the main idea of the passage?",
+    type: "multiple_choice",
+    difficulty: "medium",
+    status: "draft",
+    marks: 4,
+    topic: "Main idea",
+    skill: "Comprehension",
+    options: [
+      "One small detail from the passage.",
+      "What the whole passage is mostly about.",
+      "The longest sentence in the passage.",
+      "A new ending for the passage.",
+    ],
+    answer: "What the whole passage is mostly about.",
+    explanation: "The main idea should describe the whole passage, not one detail.",
+  });
+  assert.equal(created.response.status, 201);
+  assert.match(created.body.data.prompt, /main idea/);
+
+  const createdDetail = await getJson(`/api/v1/questions/${created.body.data.id}`, teacherCookie);
+  assert.equal(createdDetail.options.length, 4);
+  assert.equal(createdDetail.topic, "Main idea");
+
+  const questionBankPage = await fetch(`${baseUrl}/question-bank`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(questionBankPage.status, 200);
+  assert.match(await questionBankPage.text(), /Which fraction is equivalent/);
+
+  const newQuestionPage = await fetch(`${baseUrl}/question-bank/new?classId=class-p3-english`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(newQuestionPage.status, 200);
+  assert.match(await newQuestionPage.text(), /New Question/);
+
+  const detailPage = await fetch(`${baseUrl}/question-bank/question-p4-equivalent-fractions`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Use in assessment/);
+});
+
+test("admin membership can view all questions in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const questions = await getJson("/api/v1/teacher/questions", adminCookie);
+  const questionIds = questions.questions.map((question) => question.id);
+
+  assert.ok(questionIds.includes("question-p5-evaporation"));
+
+  const scienceQuestion = await fetchJson(
+    "/api/v1/questions/question-p5-evaporation",
+    adminCookie,
+  );
+  assert.equal(scienceQuestion.response.status, 200);
+  assert.match(scienceQuestion.body.data.prompt, /sunny day/);
+});
+
 test("gradebook slice records scores with the same tenant and assignment rules", async () => {
   const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/gradebooks`);
   assert.equal(unauthenticated.status, 401);

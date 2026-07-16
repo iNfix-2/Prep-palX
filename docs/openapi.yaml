@@ -355,6 +355,94 @@ components:
                 type: string
         reviewNotes:
           type: string
+    QuestionStatus:
+      type: string
+      enum: [draft, in_review, approved]
+    QuestionDifficulty:
+      type: string
+      enum: [easy, medium, hard]
+    QuestionType:
+      type: string
+      enum: [multiple_choice, short_answer, structured_response]
+    QuestionBankItem:
+      type: object
+      required: [id, classId, prompt, type, difficulty, status, marks, topic, skill, usageCount, qualityPercent, updatedAt]
+      properties:
+        id:
+          type: string
+        classId:
+          type: string
+        classDisplayName:
+          type: string
+        subjectName:
+          type: string
+        gradeName:
+          type: string
+        prompt:
+          type: string
+        type:
+          $ref: "#/components/schemas/QuestionType"
+        difficulty:
+          $ref: "#/components/schemas/QuestionDifficulty"
+        status:
+          $ref: "#/components/schemas/QuestionStatus"
+        marks:
+          type: integer
+        topic:
+          type: string
+        skill:
+          type: string
+        usageCount:
+          type: integer
+        qualityPercent:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+    QuestionDetail:
+      allOf:
+        - $ref: "#/components/schemas/QuestionBankItem"
+        - type: object
+          required: [options, answer, explanation, createdByName]
+          properties:
+            options:
+              type: array
+              items:
+                type: string
+            answer:
+              type: string
+            explanation:
+              type: string
+            createdByName:
+              type: string
+    CreateQuestionRequest:
+      type: object
+      required: [classId, prompt, type, difficulty, status, marks, topic, skill, answer, explanation]
+      properties:
+        classId:
+          type: string
+        prompt:
+          type: string
+        type:
+          $ref: "#/components/schemas/QuestionType"
+        difficulty:
+          $ref: "#/components/schemas/QuestionDifficulty"
+        status:
+          $ref: "#/components/schemas/QuestionStatus"
+        marks:
+          type: integer
+        topic:
+          type: string
+        skill:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        answer:
+          type: string
+        explanation:
+          type: string
     GradebookSheetStatus:
       type: string
       enum: [complete, partial, not_started]
@@ -727,6 +815,16 @@ paths:
           description: Unauthenticated.
         "403":
           description: Missing assessment permission.
+  /teacher/questions:
+    get:
+      summary: List reusable questions for accessible classes.
+      responses:
+        "200":
+          description: Question bank summaries.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing question permission.
   /teacher/gradebooks:
     get:
       summary: List gradebook sheets for accessible assessments.
@@ -793,6 +891,24 @@ paths:
           description: Unauthenticated.
         "403":
           description: Class is outside permitted scope or missing assessment permission.
+  /questions:
+    post:
+      summary: Create a reusable question for an accessible class.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuestionRequest"
+      responses:
+        "201":
+          description: Created question.
+        "400":
+          description: Invalid question draft.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Class is outside permitted scope or missing question permission.
   /classes/{classId}:
     get:
       summary: Get class overview if the user has access.
@@ -847,6 +963,24 @@ paths:
           description: Assessment is outside permitted class scope.
         "404":
           description: Assessment not found in active tenant.
+  /questions/{questionId}:
+    get:
+      summary: Get question detail if the user has access.
+      parameters:
+        - in: path
+          name: questionId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Question detail.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Question is outside permitted class scope.
+        "404":
+          description: Question not found in active tenant.
   /gradebooks/{assessmentId}:
     get:
       summary: Get gradebook sheet for an accessible assessment.

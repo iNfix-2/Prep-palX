@@ -22,6 +22,8 @@ fixtures in `src/lib/server/demo-store.ts`.
   plans, and a cross-tenant plan.
 - Assessments cover assigned teacher drafts, in-review work, same-tenant admin
   assessment content, and a cross-tenant assessment.
+- Questions cover assigned teacher reusable items, in-review items, same-tenant
+  admin-owned question content, and a cross-tenant question fixture.
 - Gradebook scores cover partial assigned sheets, same-tenant admin sheets, missing
   scores, and a cross-tenant score fixture.
 - Report comments cover ready and draft learner comments for assigned classes,

@@ -10,6 +10,8 @@ export const permissions = [
   "assessment.view",
   "assessment.create",
   "assessment.mark",
+  "question.view",
+  "question.manage",
   "gradebook.view",
   "report.prepare",
   "report.review",
