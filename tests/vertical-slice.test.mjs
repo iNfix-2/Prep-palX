@@ -682,6 +682,69 @@ test("admin membership can view all academic calendar events in the active works
   assert.equal(scienceEvent.body.data.title, "Science Practical Review");
 });
 
+test("resources slice scopes teacher library materials", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/resources`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const resources = await getJson("/api/v1/teacher/resources", teacherCookie);
+  const resourceIds = resources.resources.map((resource) => resource.id);
+
+  assert.ok(resourceIds.includes("resource-p4-fractions-worksheet"));
+  assert.ok(resourceIds.includes("resource-p3-comprehension-pack"));
+  assert.ok(resourceIds.includes("resource-p4-exit-ticket"));
+  assert.ok(resourceIds.includes("resource-school-report-guide"));
+  assert.ok(!resourceIds.includes("resource-p5-safety-guide"));
+
+  const assignedResource = await fetchJson(
+    "/api/v1/resources/resource-p4-fractions-worksheet",
+    teacherCookie,
+  );
+  assert.equal(assignedResource.response.status, 200);
+  assert.equal(assignedResource.body.data.title, "Fractions Revision Worksheet");
+  assert.equal(assignedResource.body.data.lessonPlanHref, "/lesson-planner/lesson-p4-fractions");
+  assert.equal(assignedResource.body.data.assessmentHref, "/assessments/assessment-p4-fractions");
+
+  const unassignedResource = await fetchJson(
+    "/api/v1/resources/resource-p5-safety-guide",
+    teacherCookie,
+  );
+  assert.equal(unassignedResource.response.status, 403);
+
+  const crossTenantResource = await fetchJson(
+    "/api/v1/resources/resource-river-community-pack",
+    teacherCookie,
+  );
+  assert.equal(crossTenantResource.response.status, 404);
+
+  const resourcesPage = await fetch(`${baseUrl}/resources`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(resourcesPage.status, 200);
+  assert.match(await resourcesPage.text(), /Fractions Revision Worksheet/);
+
+  const detailPage = await fetch(`${baseUrl}/resources/resource-p4-fractions-worksheet`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Resource Brief/);
+});
+
+test("admin membership can view all resources in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const resources = await getJson("/api/v1/teacher/resources", adminCookie);
+  const resourceIds = resources.resources.map((resource) => resource.id);
+
+  assert.ok(resourceIds.includes("resource-p5-safety-guide"));
+
+  const scienceResource = await fetchJson(
+    "/api/v1/resources/resource-p5-safety-guide",
+    adminCookie,
+  );
+  assert.equal(scienceResource.response.status, 200);
+  assert.equal(scienceResource.body.data.title, "Science Practical Safety Guide");
+});
+
 test("gradebook slice records scores with the same tenant and assignment rules", async () => {
   const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/gradebooks`);
   assert.equal(unauthenticated.status, 401);

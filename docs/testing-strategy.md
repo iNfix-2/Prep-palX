@@ -62,6 +62,10 @@ Implemented coverage:
 - Calendar event detail follows same-tenant `403` and cross-tenant `404` rules.
 - Academic calendar date filtering validates `YYYY-MM-DD`.
 - Admin membership can view all calendar events in the active tenant.
+- Unauthenticated `/api/v1/teacher/resources` returns `401`.
+- Teacher resources are filtered to workspace, assigned class, and teacher-owned visibility.
+- Resource detail follows same-tenant `403` and cross-tenant `404` rules.
+- Admin membership can view all resources in the active tenant.
 - Unauthenticated `/api/v1/teacher/gradebooks` returns `401`.
 - Teacher gradebook sheets are filtered to assigned classes.
 - Gradebook sheet detail follows same-tenant `403` and cross-tenant `404` rules.
@@ -121,12 +125,14 @@ Initial critical path is partially covered by the integration test:
 17. Timetable Event.
 18. Academic Calendar.
 19. Calendar Event.
-20. Gradebook.
-21. Gradebook Sheet.
-22. Reports.
-23. Class Report.
-24. Approvals.
-25. Approval Detail.
+20. Resources.
+21. Resource Detail.
+22. Gradebook.
+23. Gradebook Sheet.
+24. Reports.
+25. Class Report.
+26. Approvals.
+27. Approval Detail.
 
 Future paths:
 

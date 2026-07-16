@@ -30,6 +30,9 @@ fixtures in `src/lib/server/demo-store.ts`.
 - Academic calendar events cover active term windows, teacher-owned planning
   notes, assigned class milestones, same-tenant admin-owned class events, and a
   cross-tenant event fixture.
+- Resources cover workspace-wide shared guides, assigned class materials,
+  teacher-owned drafts, same-tenant admin-owned class resources, and a
+  cross-tenant fixture.
 - Gradebook scores cover partial assigned sheets, same-tenant admin sheets, missing
   scores, and a cross-tenant score fixture.
 - Report comments cover ready and draft learner comments for assigned classes,

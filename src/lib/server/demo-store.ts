@@ -189,6 +189,35 @@ export interface DemoAcademicCalendarEvent {
   linkedReportClassId?: string;
 }
 
+export type DemoResourceType = "worksheet" | "slide_deck" | "rubric" | "guide" | "link" | "video";
+export type DemoResourceStatus = "ready" | "draft" | "needs_tags" | "archived";
+export type DemoResourceVisibility = "workspace" | "class" | "teacher";
+export type DemoResourceOrigin = "uploaded" | "ai_generated" | "shared";
+export type DemoResourceFileKind = "pdf" | "doc" | "slides" | "link" | "video" | "image";
+
+export interface DemoResource {
+  id: string;
+  workspaceId: string;
+  classId?: string;
+  ownerMembershipId?: string;
+  title: string;
+  type: DemoResourceType;
+  status: DemoResourceStatus;
+  visibility: DemoResourceVisibility;
+  origin: DemoResourceOrigin;
+  fileKind: DemoResourceFileKind;
+  description: string;
+  tags: string[];
+  sizeLabel: string;
+  usageCount: number;
+  updatedAt: string;
+  lastUsedAt?: string;
+  url?: string;
+  linkedLessonPlanId?: string;
+  linkedAssessmentId?: string;
+  linkedQuestionId?: string;
+}
+
 export type DemoGradebookScoreStatus = "scored" | "missing" | "excused";
 
 export interface DemoGradebookScore {
@@ -352,6 +381,8 @@ export const demoMemberships: DemoMembership[] = [
       "assessment.mark",
       "question.view",
       "question.manage",
+      "resource.view",
+      "resource.manage",
       "gradebook.view",
       "report.prepare",
       "approval.view",
@@ -381,6 +412,8 @@ export const demoMemberships: DemoMembership[] = [
       "assessment.mark",
       "question.view",
       "question.manage",
+      "resource.view",
+      "resource.manage",
       "gradebook.view",
       "report.prepare",
       "report.review",
@@ -405,6 +438,7 @@ export const demoMemberships: DemoMembership[] = [
       "attendance.record",
       "lesson.view",
       "lesson.create",
+      "resource.view",
     ],
   },
 ];
@@ -1240,6 +1274,122 @@ export const demoAcademicCalendarEvents: DemoAcademicCalendarEvent[] = [
   },
 ];
 
+export const demoResources: DemoResource[] = [
+  {
+    id: "resource-p4-fractions-worksheet",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    ownerMembershipId: "mem-truth-teacher-ade",
+    title: "Fractions Revision Worksheet",
+    type: "worksheet",
+    status: "ready",
+    visibility: "class",
+    origin: "ai_generated",
+    fileKind: "pdf",
+    description: "Differentiated practice set for equivalent fractions with visual models.",
+    tags: ["Mathematics", "Primary 4", "Fractions", "Differentiation"],
+    sizeLabel: "1.8 MB",
+    usageCount: 8,
+    updatedAt: "2026-07-16T14:05:00.000Z",
+    lastUsedAt: "2026-07-16T13:40:00.000Z",
+    linkedLessonPlanId: "lesson-p4-fractions",
+    linkedAssessmentId: "assessment-p4-fractions",
+  },
+  {
+    id: "resource-p3-comprehension-pack",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    ownerMembershipId: "mem-truth-teacher-ade",
+    title: "Comprehension Passage Pack",
+    type: "worksheet",
+    status: "needs_tags",
+    visibility: "class",
+    origin: "uploaded",
+    fileKind: "doc",
+    description: "Three short reading passages with vocabulary prompts and main-idea checks.",
+    tags: ["English", "Primary 3"],
+    sizeLabel: "620 KB",
+    usageCount: 5,
+    updatedAt: "2026-07-15T16:20:00.000Z",
+    lastUsedAt: "2026-07-16T11:35:00.000Z",
+    linkedLessonPlanId: "lesson-p3-reading",
+  },
+  {
+    id: "resource-p4-exit-ticket",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    ownerMembershipId: "mem-truth-teacher-ade",
+    title: "Equivalent Fractions Exit Ticket",
+    type: "worksheet",
+    status: "draft",
+    visibility: "teacher",
+    origin: "ai_generated",
+    fileKind: "pdf",
+    description: "Teacher-owned quick exit check for spotting fraction-model misconceptions.",
+    tags: ["Mathematics", "Assessment prep", "Exit ticket"],
+    sizeLabel: "420 KB",
+    usageCount: 0,
+    updatedAt: "2026-07-16T12:30:00.000Z",
+    linkedQuestionId: "question-p4-equivalent-fractions",
+  },
+  {
+    id: "resource-school-report-guide",
+    workspaceId: "school-truth",
+    title: "Report Comment Style Guide",
+    type: "guide",
+    status: "ready",
+    visibility: "workspace",
+    origin: "shared",
+    fileKind: "link",
+    description: "Workspace-wide guidance for concise learner comments and support language.",
+    tags: ["Reports", "Writing", "School policy"],
+    sizeLabel: "Shared link",
+    usageCount: 24,
+    updatedAt: "2026-07-14T09:15:00.000Z",
+    lastUsedAt: "2026-07-16T08:10:00.000Z",
+    url: "https://prep-pal.local/resources/report-style-guide",
+  },
+  {
+    id: "resource-p5-safety-guide",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    ownerMembershipId: "mem-truth-admin",
+    title: "Science Practical Safety Guide",
+    type: "guide",
+    status: "ready",
+    visibility: "class",
+    origin: "shared",
+    fileKind: "pdf",
+    description: "Lab safety checklist and observation sheet for evaporation practicals.",
+    tags: ["Science", "Primary 5", "Lab safety"],
+    sizeLabel: "2.1 MB",
+    usageCount: 11,
+    updatedAt: "2026-07-15T15:10:00.000Z",
+    lastUsedAt: "2026-07-16T14:45:00.000Z",
+    linkedLessonPlanId: "lesson-p5-evaporation",
+    linkedAssessmentId: "assessment-p5-matter",
+  },
+  {
+    id: "resource-river-community-pack",
+    workspaceId: "school-river",
+    classId: "class-river-history",
+    ownerMembershipId: "mem-river-teacher",
+    title: "Community Helpers Picture Cards",
+    type: "slide_deck",
+    status: "ready",
+    visibility: "class",
+    origin: "uploaded",
+    fileKind: "slides",
+    description: "Tenant isolation fixture for resource-library scope checks.",
+    tags: ["History", "Community"],
+    sizeLabel: "4.2 MB",
+    usageCount: 3,
+    updatedAt: "2026-07-16T10:45:00.000Z",
+    lastUsedAt: "2026-07-16T11:00:00.000Z",
+    linkedLessonPlanId: "lesson-river-community",
+  },
+];
+
 export const demoGradebookScores: DemoGradebookScore[] = [
   {
     id: "score-p4-fractions-ada",
@@ -1580,6 +1730,10 @@ export function getTimetableEvent(eventId: string) {
 
 export function getAcademicCalendarEvent(eventId: string) {
   return demoAcademicCalendarEvents.find((event) => event.id === eventId) ?? null;
+}
+
+export function getResource(resourceId: string) {
+  return demoResources.find((resource) => resource.id === resourceId) ?? null;
 }
 
 export function upsertDemoAttendanceRecords(

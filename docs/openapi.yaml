@@ -634,6 +634,107 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AcademicCalendarEvent"
+    ResourceType:
+      type: string
+      enum: [worksheet, slide_deck, rubric, guide, link, video]
+    ResourceStatus:
+      type: string
+      enum: [ready, draft, needs_tags, archived]
+    ResourceVisibility:
+      type: string
+      enum: [workspace, class, teacher]
+    ResourceOrigin:
+      type: string
+      enum: [uploaded, ai_generated, shared]
+    ResourceFileKind:
+      type: string
+      enum: [pdf, doc, slides, link, video, image]
+    Resource:
+      type: object
+      required: [id, title, type, status, visibility, origin, fileKind, description, tags, sizeLabel, usageCount, updatedAt]
+      properties:
+        id:
+          type: string
+        classId:
+          type: string
+        classDisplayName:
+          type: string
+        subjectName:
+          type: string
+        gradeName:
+          type: string
+        title:
+          type: string
+        type:
+          $ref: "#/components/schemas/ResourceType"
+        status:
+          $ref: "#/components/schemas/ResourceStatus"
+        visibility:
+          $ref: "#/components/schemas/ResourceVisibility"
+        origin:
+          $ref: "#/components/schemas/ResourceOrigin"
+        fileKind:
+          $ref: "#/components/schemas/ResourceFileKind"
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        sizeLabel:
+          type: string
+        usageCount:
+          type: integer
+        updatedAt:
+          type: string
+          format: date-time
+        lastUsedAt:
+          type: string
+          format: date-time
+        url:
+          type: string
+        linkedLessonPlanId:
+          type: string
+        linkedAssessmentId:
+          type: string
+        linkedQuestionId:
+          type: string
+    ResourceDetail:
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          required: [workspace]
+          properties:
+            workspace:
+              type: object
+            ownerName:
+              type: string
+            classHref:
+              type: string
+            lessonPlanHref:
+              type: string
+            assessmentHref:
+              type: string
+            questionHref:
+              type: string
+    TeacherResourcesResponse:
+      type: object
+      required: [workspace, permissions, resources]
+      properties:
+        workspace:
+          type: object
+        permissions:
+          type: object
+          required: [canManageResources, canUseAi]
+          properties:
+            canManageResources:
+              type: boolean
+            canUseAi:
+              type: boolean
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/Resource"
     GradebookSheetStatus:
       type: string
       enum: [complete, partial, not_started]
@@ -1060,6 +1161,20 @@ paths:
           description: Unauthenticated.
         "403":
           description: Missing academic calendar permission.
+  /teacher/resources:
+    get:
+      summary: List resources for the authenticated teacher.
+      responses:
+        "200":
+          description: Resource library items.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeacherResourcesResponse"
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing resource permission.
   /teacher/gradebooks:
     get:
       summary: List gradebook sheets for accessible assessments.
@@ -1260,6 +1375,28 @@ paths:
           description: Academic calendar event is outside permitted scope.
         "404":
           description: Academic calendar event not found in active tenant.
+  /resources/{resourceId}:
+    get:
+      summary: Get resource detail if the user has access.
+      parameters:
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Resource detail.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResourceDetail"
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Resource is outside permitted scope.
+        "404":
+          description: Resource not found in active tenant.
   /gradebooks/{assessmentId}:
     get:
       summary: Get gradebook sheet for an accessible assessment.

@@ -82,6 +82,8 @@ Preferred production approach:
 - `assessment.mark`
 - `question.view`
 - `question.manage`
+- `resource.view`
+- `resource.manage`
 - `gradebook.view`
 - `assessment.moderate`
 - `assessment.approve`
