@@ -297,6 +297,124 @@ test("admin membership can view all lesson plans in the active workspace", async
   assert.equal(sciencePlan.body.data.title, "Evaporation Practical");
 });
 
+test("assessment slice creates and scopes assessment drafts", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/assessments`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const assessments = await getJson("/api/v1/teacher/assessments", teacherCookie);
+  const assessmentIds = assessments.assessments.map((assessment) => assessment.id);
+  assert.deepEqual(assessmentIds, ["assessment-p4-fractions", "assessment-p3-comprehension"]);
+
+  const assignedAssessment = await fetchJson(
+    "/api/v1/assessments/assessment-p4-fractions",
+    teacherCookie,
+  );
+  assert.equal(assignedAssessment.response.status, 200);
+  assert.equal(assignedAssessment.body.data.title, "Fractions Quick Check");
+
+  const unassignedAssessment = await fetchJson(
+    "/api/v1/assessments/assessment-p5-matter",
+    teacherCookie,
+  );
+  assert.equal(unassignedAssessment.response.status, 403);
+
+  const crossTenantAssessment = await fetchJson(
+    "/api/v1/assessments/assessment-river-community",
+    teacherCookie,
+  );
+  assert.equal(crossTenantAssessment.response.status, 404);
+
+  const invalidDraft = await postJson("/api/v1/assessments", teacherCookie, {
+    classId: "class-p4-math",
+    title: "",
+    type: "quiz",
+    scheduledFor: "2026-07-25",
+    dueDate: "2026-07-25",
+    durationMinutes: 30,
+    totalMarks: 20,
+    topics: ["Equivalent fractions"],
+    instructions: "Complete all items.",
+    items: [{ prompt: "Show one equivalent fraction.", marks: 5, skill: "Reasoning" }],
+    reviewNotes: "Check mark total.",
+  });
+  assert.equal(invalidDraft.response.status, 400);
+
+  const unassignedDraft = await postJson("/api/v1/assessments", teacherCookie, {
+    classId: "class-p5-science",
+    title: "Matter Evidence Draft",
+    type: "continuous_assessment",
+    scheduledFor: "2026-07-25",
+    dueDate: "2026-07-25",
+    durationMinutes: 35,
+    totalMarks: 20,
+    topics: ["Evaporation"],
+    instructions: "Record observations.",
+    items: [{ prompt: "Explain one observed change.", marks: 20, skill: "Explanation" }],
+    reviewNotes: "Outside assigned scope.",
+  });
+  assert.equal(unassignedDraft.response.status, 403);
+
+  const created = await postJson("/api/v1/assessments", teacherCookie, {
+    classId: "class-p3-english",
+    title: "Vocabulary Evidence Check",
+    type: "classwork",
+    scheduledFor: "2026-07-25",
+    dueDate: "2026-07-25",
+    durationMinutes: 30,
+    totalMarks: 20,
+    topics: ["Vocabulary", "Short response"],
+    instructions: "Read each sentence and choose the strongest word.",
+    items: [
+      { prompt: "Choose the best word for the sentence.", marks: 8, skill: "Vocabulary" },
+      { prompt: "Explain one word choice.", marks: 12, skill: "Explanation" },
+    ],
+    reviewNotes: "Confirm support vocabulary before review.",
+  });
+  assert.equal(created.response.status, 201);
+  assert.equal(created.body.data.title, "Vocabulary Evidence Check");
+
+  const createdDetail = await getJson(
+    `/api/v1/assessments/${created.body.data.id}`,
+    teacherCookie,
+  );
+  assert.equal(createdDetail.totalMarks, 20);
+  assert.equal(createdDetail.items.length, 2);
+
+  const assessmentsPage = await fetch(`${baseUrl}/assessments`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(assessmentsPage.status, 200);
+  assert.match(await assessmentsPage.text(), /Fractions Quick Check/);
+
+  const newAssessmentPage = await fetch(`${baseUrl}/assessments/new?classId=class-p3-english`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(newAssessmentPage.status, 200);
+  assert.match(await newAssessmentPage.text(), /New Assessment/);
+
+  const detailPage = await fetch(`${baseUrl}/assessments/assessment-p4-fractions`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Assessment Items/);
+});
+
+test("admin membership can view all assessments in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const assessments = await getJson("/api/v1/teacher/assessments", adminCookie);
+  const assessmentIds = assessments.assessments.map((assessment) => assessment.id);
+
+  assert.ok(assessmentIds.includes("assessment-p5-matter"));
+
+  const scienceAssessment = await fetchJson(
+    "/api/v1/assessments/assessment-p5-matter",
+    adminCookie,
+  );
+  assert.equal(scienceAssessment.response.status, 200);
+  assert.equal(scienceAssessment.body.data.title, "Matter and Change Practical Evidence");
+});
+
 async function login(email, password) {
   const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: "POST",

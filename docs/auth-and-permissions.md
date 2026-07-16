@@ -73,6 +73,9 @@ Preferred production approach:
 - `learner.view`
 - `attendance.record`
 - `attendance.view_reports`
+- `lesson.view`
+- `lesson.create`
+- `assessment.view`
 - `assessment.create`
 - `assessment.mark`
 - `assessment.moderate`

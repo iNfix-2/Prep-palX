@@ -249,6 +249,112 @@ components:
           type: string
         differentiation:
           type: string
+    AssessmentStatus:
+      type: string
+      enum: [draft, in_review, published]
+    AssessmentType:
+      type: string
+      enum: [classwork, quiz, continuous_assessment, exam]
+    AssessmentItem:
+      type: object
+      required: [id, prompt, marks, skill]
+      properties:
+        id:
+          type: string
+        prompt:
+          type: string
+        marks:
+          type: integer
+        skill:
+          type: string
+    AssessmentListItem:
+      type: object
+      required: [id, classId, title, type, status, scheduledFor, dueDate, totalMarks]
+      properties:
+        id:
+          type: string
+        classId:
+          type: string
+        classDisplayName:
+          type: string
+        title:
+          type: string
+        type:
+          $ref: "#/components/schemas/AssessmentType"
+        status:
+          $ref: "#/components/schemas/AssessmentStatus"
+        scheduledFor:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        durationMinutes:
+          type: integer
+        totalMarks:
+          type: integer
+        itemCount:
+          type: integer
+        readinessPercent:
+          type: integer
+    AssessmentDetail:
+      allOf:
+        - $ref: "#/components/schemas/AssessmentListItem"
+        - type: object
+          required: [topics, instructions, items, reviewNotes]
+          properties:
+            topics:
+              type: array
+              items:
+                type: string
+            instructions:
+              type: string
+            items:
+              type: array
+              items:
+                $ref: "#/components/schemas/AssessmentItem"
+            reviewNotes:
+              type: string
+    CreateAssessmentRequest:
+      type: object
+      required: [classId, title, type, scheduledFor, dueDate, durationMinutes, totalMarks, topics, instructions, items]
+      properties:
+        classId:
+          type: string
+        title:
+          type: string
+        type:
+          $ref: "#/components/schemas/AssessmentType"
+        scheduledFor:
+          type: string
+          format: date
+        dueDate:
+          type: string
+          format: date
+        durationMinutes:
+          type: integer
+        totalMarks:
+          type: integer
+        topics:
+          type: array
+          items:
+            type: string
+        instructions:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            required: [prompt, marks, skill]
+            properties:
+              prompt:
+                type: string
+              marks:
+                type: integer
+              skill:
+                type: string
+        reviewNotes:
+          type: string
 paths:
   /auth/login:
     post:
@@ -340,6 +446,16 @@ paths:
           description: Unauthenticated.
         "403":
           description: Missing lesson permission.
+  /teacher/assessments:
+    get:
+      summary: List assessments for accessible classes.
+      responses:
+        "200":
+          description: Assessment summaries.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing assessment permission.
   /lesson-plans:
     post:
       summary: Create a lesson plan draft for an accessible class.
@@ -358,6 +474,24 @@ paths:
           description: Unauthenticated.
         "403":
           description: Class is outside permitted scope or missing lesson permission.
+  /assessments:
+    post:
+      summary: Create an assessment draft for an accessible class.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAssessmentRequest"
+      responses:
+        "201":
+          description: Created assessment.
+        "400":
+          description: Invalid assessment draft.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Class is outside permitted scope or missing assessment permission.
   /classes/{classId}:
     get:
       summary: Get class overview if the user has access.
@@ -394,6 +528,24 @@ paths:
           description: Lesson plan is outside permitted class scope.
         "404":
           description: Lesson plan not found in active tenant.
+  /assessments/{assessmentId}:
+    get:
+      summary: Get assessment detail if the user has access.
+      parameters:
+        - in: path
+          name: assessmentId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Assessment detail.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Assessment is outside permitted class scope.
+        "404":
+          description: Assessment not found in active tenant.
   /classes/{classId}/attendance:
     get:
       summary: Get attendance register for an accessible class.

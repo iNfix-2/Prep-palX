@@ -7,6 +7,7 @@ export const permissions = [
   "attendance.view_reports",
   "lesson.view",
   "lesson.create",
+  "assessment.view",
   "assessment.create",
   "ai.use",
 ] as const;

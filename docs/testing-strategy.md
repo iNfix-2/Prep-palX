@@ -42,6 +42,11 @@ Implemented coverage:
 - Lesson plan detail follows same-tenant `403` and cross-tenant `404` rules.
 - Lesson plan creation validates required fields and assigned-class scope.
 - Admin membership can view all lesson plans in the active tenant.
+- Unauthenticated `/api/v1/teacher/assessments` returns `401`.
+- Teacher assessments are filtered to assigned classes.
+- Assessment detail follows same-tenant `403` and cross-tenant `404` rules.
+- Assessment creation validates required fields, mark totals, and assigned-class scope.
+- Admin membership can view all assessments in the active tenant.
 
 Cover:
 
@@ -75,6 +80,9 @@ Initial critical path is partially covered by the integration test:
 7. Lesson Planner.
 8. New Lesson Plan.
 9. Lesson Plan Detail.
+10. Assessments.
+11. New Assessment.
+12. Assessment Detail.
 
 Future paths:
 

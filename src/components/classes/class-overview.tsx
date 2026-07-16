@@ -51,6 +51,13 @@ export function ClassOverview({ view }: { view: ClassOverviewView }) {
             Prepare lesson
           </Link>
           <Link
+            href={`/assessments/new?classId=${view.id}`}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-surface-border bg-surface px-4 text-body-md font-semibold text-foreground transition-colors hover:bg-background"
+          >
+            <Icon name="assignment_add" className="text-[18px]" />
+            New assessment
+          </Link>
+          <Link
             href="/ask-pal"
             className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-ai px-4 text-body-md font-semibold text-on-ai transition-colors hover:bg-ai-hover"
           >

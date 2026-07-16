@@ -83,6 +83,36 @@ export interface DemoLessonPlan {
   updatedAt: string;
 }
 
+export type DemoAssessmentStatus = "draft" | "in_review" | "published";
+export type DemoAssessmentType = "classwork" | "quiz" | "continuous_assessment" | "exam";
+
+export interface DemoAssessmentItem {
+  id: string;
+  prompt: string;
+  marks: number;
+  skill: string;
+}
+
+export interface DemoAssessment {
+  id: string;
+  workspaceId: string;
+  classId: string;
+  title: string;
+  type: DemoAssessmentType;
+  status: DemoAssessmentStatus;
+  scheduledFor: string;
+  dueDate: string;
+  durationMinutes: number;
+  totalMarks: number;
+  topics: string[];
+  instructions: string;
+  items: DemoAssessmentItem[];
+  reviewNotes: string;
+  readinessPercent: number;
+  createdByMembershipId: string;
+  updatedAt: string;
+}
+
 export interface DemoClassTask {
   id: string;
   title: string;
@@ -179,6 +209,7 @@ export const demoMemberships: DemoMembership[] = [
       "attendance.view_reports",
       "lesson.view",
       "lesson.create",
+      "assessment.view",
       "assessment.create",
       "ai.use",
     ],
@@ -199,6 +230,7 @@ export const demoMemberships: DemoMembership[] = [
       "attendance.view_reports",
       "lesson.view",
       "lesson.create",
+      "assessment.view",
       "assessment.create",
       "ai.use",
     ],
@@ -610,6 +642,153 @@ export const demoLessonPlans: DemoLessonPlan[] = [
   },
 ];
 
+export const demoAssessments: DemoAssessment[] = [
+  {
+    id: "assessment-p4-fractions",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    title: "Fractions Quick Check",
+    type: "quiz",
+    status: "draft",
+    scheduledFor: "2026-07-22",
+    dueDate: "2026-07-22",
+    durationMinutes: 25,
+    totalMarks: 20,
+    topics: ["Equivalent fractions", "Visual models", "Comparing fractions"],
+    instructions:
+      "Learners answer independently. Allow fraction strips for the first two questions only.",
+    items: [
+      {
+        id: "assessment-p4-fractions-item-1",
+        prompt: "Shade a model that proves 2/4 is equivalent to 1/2.",
+        marks: 6,
+        skill: "Representation",
+      },
+      {
+        id: "assessment-p4-fractions-item-2",
+        prompt: "Circle the fraction equivalent to 3/6 and explain your choice.",
+        marks: 6,
+        skill: "Reasoning",
+      },
+      {
+        id: "assessment-p4-fractions-item-3",
+        prompt: "Order 1/2, 3/4, and 2/3 from least to greatest.",
+        marks: 8,
+        skill: "Comparison",
+      },
+    ],
+    reviewNotes:
+      "Check whether Kene needs a visual support item before this moves to review.",
+    readinessPercent: 82,
+    createdByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T12:10:00.000Z",
+  },
+  {
+    id: "assessment-p3-comprehension",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    title: "Main Idea Exit Assessment",
+    type: "classwork",
+    status: "in_review",
+    scheduledFor: "2026-07-23",
+    dueDate: "2026-07-23",
+    durationMinutes: 30,
+    totalMarks: 15,
+    topics: ["Main idea", "Supporting evidence", "Short response"],
+    instructions:
+      "Read the short passage twice, underline evidence, then write one clear main idea sentence.",
+    items: [
+      {
+        id: "assessment-p3-comprehension-item-1",
+        prompt: "Underline one sentence that supports the main idea.",
+        marks: 5,
+        skill: "Evidence",
+      },
+      {
+        id: "assessment-p3-comprehension-item-2",
+        prompt: "Write the main idea in one complete sentence.",
+        marks: 6,
+        skill: "Comprehension",
+      },
+      {
+        id: "assessment-p3-comprehension-item-3",
+        prompt: "Choose the best title for the passage.",
+        marks: 4,
+        skill: "Summary",
+      },
+    ],
+    reviewNotes: "Reviewer should confirm the passage vocabulary is accessible.",
+    readinessPercent: 93,
+    createdByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T12:45:00.000Z",
+  },
+  {
+    id: "assessment-p5-matter",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    title: "Matter and Change Practical Evidence",
+    type: "continuous_assessment",
+    status: "published",
+    scheduledFor: "2026-07-24",
+    dueDate: "2026-07-24",
+    durationMinutes: 40,
+    totalMarks: 25,
+    topics: ["Evaporation", "Observation", "Conclusion"],
+    instructions:
+      "Learners record observations during the practical and write a short conclusion.",
+    items: [
+      {
+        id: "assessment-p5-matter-item-1",
+        prompt: "Record two observations from the evaporation setup.",
+        marks: 10,
+        skill: "Observation",
+      },
+      {
+        id: "assessment-p5-matter-item-2",
+        prompt: "Explain what changed and why.",
+        marks: 10,
+        skill: "Scientific explanation",
+      },
+      {
+        id: "assessment-p5-matter-item-3",
+        prompt: "List one safety rule followed during the practical.",
+        marks: 5,
+        skill: "Safety",
+      },
+    ],
+    reviewNotes: "Admin-owned fixture for class-scope checks.",
+    readinessPercent: 100,
+    createdByMembershipId: "mem-truth-admin",
+    updatedAt: "2026-07-15T15:30:00.000Z",
+  },
+  {
+    id: "assessment-river-community",
+    workspaceId: "school-river",
+    classId: "class-river-history",
+    title: "Community Helpers Check",
+    type: "quiz",
+    status: "draft",
+    scheduledFor: "2026-07-22",
+    dueDate: "2026-07-22",
+    durationMinutes: 20,
+    totalMarks: 10,
+    topics: ["Community helpers"],
+    instructions: "Learners match helpers to the service they provide.",
+    items: [
+      {
+        id: "assessment-river-community-item-1",
+        prompt: "Name two community helpers and their jobs.",
+        marks: 10,
+        skill: "Recall",
+      },
+    ],
+    reviewNotes: "Tenant isolation fixture.",
+    readinessPercent: 70,
+    createdByMembershipId: "mem-river-teacher",
+    updatedAt: "2026-07-16T10:30:00.000Z",
+  },
+];
+
 export function findDemoUserBySession(token: string | undefined) {
   const session = demoSessions.find((item) => item.token === token);
   return session ? demoUsers.find((user) => user.id === session.userId) ?? null : null;
@@ -721,6 +900,24 @@ export function createDemoLessonPlan(
   return lessonPlan;
 }
 
+export function createDemoAssessment(
+  input: Omit<DemoAssessment, "id" | "updatedAt" | "readinessPercent" | "status"> & {
+    status?: DemoAssessmentStatus;
+    readinessPercent?: number;
+  },
+) {
+  const assessment: DemoAssessment = {
+    ...input,
+    id: `assessment-${demoAssessments.length + 1}`,
+    status: input.status ?? "draft",
+    readinessPercent: input.readinessPercent ?? calculateAssessmentReadiness(input),
+    updatedAt: new Date().toISOString(),
+  };
+
+  demoAssessments.push(assessment);
+  return assessment;
+}
+
 function calculateLessonReadiness(input: {
   objectives: string[];
   materials: string[];
@@ -738,6 +935,34 @@ function calculateLessonReadiness(input: {
     input.learnerPractice.length > 0,
     input.assessmentCheck.length > 0,
     input.differentiation.length > 0,
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
+
+function calculateAssessmentReadiness(input: {
+  title: string;
+  type: DemoAssessmentType;
+  scheduledFor: string;
+  dueDate: string;
+  durationMinutes: number;
+  totalMarks: number;
+  topics: string[];
+  instructions: string;
+  items: DemoAssessmentItem[];
+  reviewNotes: string;
+}) {
+  const itemMarks = input.items.reduce((sum, item) => sum + item.marks, 0);
+  const checks = [
+    input.title.length > 0,
+    input.type.length > 0,
+    input.scheduledFor.length > 0,
+    input.dueDate.length > 0,
+    input.durationMinutes >= 10,
+    input.totalMarks > 0 && itemMarks === input.totalMarks,
+    input.topics.length > 0,
+    input.instructions.length > 0,
+    input.items.length > 0,
+    input.reviewNotes.length > 0,
   ];
   return Math.round((checks.filter(Boolean).length / checks.length) * 100);
 }

@@ -2,19 +2,20 @@
 
 ## Current Standard
 
-Current API routes are mock-only and unversioned. Target production API should use `/api/v1/...` with consistent auth, tenant, errors, and DTOs.
+Legacy prototype API routes are mock-only and unversioned. Integrated demo slices use `/api/v1/...` with consistent auth, tenant, errors, and DTOs; production APIs should preserve those boundaries.
 
 ## Matrix
 
 | Screen | Route | Domain | Roles | Data Required | Read Ops | Write Ops | API Endpoints | Schemas | Permission | Required States | Current Status | Blocker |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Teacher Dashboard | `/` | Teaching ops | Teacher | teacher summary, schedule, tasks, progress | dashboard summary | none initially | `GET /api/v1/teacher/dashboard` | `TeacherDashboardDto` | `dashboard.view` | loading, empty, error, unauthorized | mock-only | auth/tenant/API |
-| My Classes | `/classes` | Classes | Teacher | class id/name/subject/year/teacher/learner count/progress | list assigned classes | none | `GET /api/v1/teacher/classes` | `TeacherClassListItemDto[]` | `class.view_assigned` | loading, empty, error, unauthorized, forbidden | next vertical slice | auth/session/database |
-| Class Overview | `/classes/[classId]` | Classes | Teacher/Admin | class details, learners, subject, attendance, tasks | class detail | future notes/tasks | `GET /api/v1/classes/{classId}` | `ClassOverviewDto` | `class.view_assigned` or `class.manage` | loading, error, unauthorized, forbidden | missing | route/API/model |
-| Lesson Planner | `/lesson-planner` | Teaching ops | Teacher | lesson list/templates/status | list lessons | create/update later | `GET /api/v1/lessons` | `LessonPlanDto[]` | `lesson.view` | all async states | mock-only | lesson model |
-| New Lesson Plan | `/lesson-planner/new` | Teaching ops | Teacher | classes, subjects, objectives, resources | load defaults | create draft | `POST /api/v1/lessons` | `CreateLessonRequest` | `lesson.create` | validation/submitting/errors | static form | validation/API |
-| Assessments | `/assessments` | Assessment | Teacher/Reviewer | assessment drafts/review/published | list assessments | submit review later | `GET /api/v1/assessments` | `AssessmentSummaryDto[]` | `assessment.view` | all async states | mock-only | assessment model |
-| New Assessment | `/assessments/new` | Assessment | Teacher | classes, subjects, items, marks | load config | create draft | `POST /api/v1/assessments` | `CreateAssessmentRequest` | `assessment.create` | validation/submitting/errors | static form | validation/API |
+| My Classes | `/classes` | Classes | Teacher | class id/name/subject/year/teacher/learner count/progress | list assigned classes | none | `GET /api/v1/teacher/classes` | `TeacherClassListItemDto[]` | `class.view_assigned` | loading, empty, error, unauthorized, forbidden | demo integrated | database |
+| Class Overview | `/classes/[classId]` | Classes | Teacher/Admin | class details, learners, subject, attendance, tasks | class detail | future notes/tasks | `GET /api/v1/classes/{classId}` | `ClassOverviewDto` | `class.view_assigned` or `class.manage` | loading, error, unauthorized, forbidden | demo integrated | database |
+| Lesson Planner | `/lesson-planner` | Teaching ops | Teacher/Admin | lesson list/templates/status | list lessons | create draft | `GET /api/v1/teacher/lesson-plans`, `POST /api/v1/lesson-plans` | `LessonPlanListItemDto[]`, `CreateLessonPlanDto` | `lesson.view` / `lesson.create` | loading, empty, error, unauthorized, forbidden | demo integrated | database |
+| New Lesson Plan | `/lesson-planner/new` | Teaching ops | Teacher/Admin | classes, subjects, objectives, resources | load options | create draft | `POST /api/v1/lesson-plans` | `CreateLessonPlanDto` | `lesson.create` | validation/errors | demo integrated | database |
+| Assessments | `/assessments` | Assessment | Teacher/Admin | assessment drafts/review/published | list assessments | create draft | `GET /api/v1/teacher/assessments`, `POST /api/v1/assessments` | `AssessmentListItemDto[]`, `CreateAssessmentDto` | `assessment.view` / `assessment.create` | loading, empty, error, unauthorized, forbidden | demo integrated | database |
+| New Assessment | `/assessments/new` | Assessment | Teacher/Admin | classes, subjects, items, marks | load options | create draft | `POST /api/v1/assessments` | `CreateAssessmentDto` | `assessment.create` | validation/errors | demo integrated | database |
+| Assessment Detail | `/assessments/[assessmentId]` | Assessment | Teacher/Admin | instructions, topics, items, marks, review notes | assessment detail | future submit/review | `GET /api/v1/assessments/{assessmentId}` | `AssessmentDetailDto` | `assessment.view` / `assessment.create` | loading, error, unauthorized, forbidden | demo integrated | database |
 | Question Bank | `/question-bank` | Assessment | Teacher/Reviewer | questions, tags, review status | list/search questions | add/edit later | `GET /api/v1/questions` | `QuestionDto[]` | `question.view` | loading/empty/error/pagination | mock-only | question model |
 | Gradebook | `/gradebook` | Gradebook | Teacher | result sheets, learners, scores | list gradebooks | update scores later | `GET /api/v1/gradebooks` | `GradebookDto[]` | `gradebook.view` | loading/large/error | mock-only | grade model |
 | Attendance | `/attendance` | Attendance | Teacher | register sessions, learners | list/load register | submit attendance | `GET /api/v1/attendance/sessions`, `POST /api/v1/attendance/sessions` | `AttendanceSessionDto` | `attendance.record` | loading/empty/error/duplicate submit | mock-only | attendance model |
@@ -30,4 +31,3 @@ Current API routes are mock-only and unversioned. Target production API should u
 - Search: learner/class/question/resource lists.
 - File upload: resources, assessment imports, report templates.
 - Audit: attendance submissions, score changes, approvals, AI confirmations.
-

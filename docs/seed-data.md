@@ -20,6 +20,8 @@ fixtures in `src/lib/server/demo-store.ts`.
   unassigned, and cross-tenant register scenarios.
 - Lesson plans cover assigned teacher drafts, in-review plans, same-tenant admin
   plans, and a cross-tenant plan.
+- Assessments cover assigned teacher drafts, in-review work, same-tenant admin
+  assessment content, and a cross-tenant assessment.
 
 Required seed scenarios:
 
