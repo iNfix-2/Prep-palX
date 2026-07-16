@@ -20,6 +20,9 @@ fixtures in `src/lib/server/demo-store.ts`.
   tasks, support requests, gradebook sheets, reports, approvals, and resources.
 - Account settings cover notification preferences, display density, AI confirmation
   settings, session counts, password metadata, and workspace-selection permission.
+- Ask Pal derives tenant-scoped assistant context from visible classes, timetable
+  events, resources, tasks, and gradebook sheets; demo AI proposals are recorded
+  in memory with confirmation metadata.
 - Teacher tasks cover assigned work, class-scoped follow-ups, workspace-wide tasks,
   same-tenant admin tasks, status/activity updates, and a cross-tenant fixture.
 - Support guides and support requests cover global guides, workspace guides,

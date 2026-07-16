@@ -381,6 +381,257 @@ components:
             $ref: "#/components/schemas/DashboardRecentWork"
         insight:
           $ref: "#/components/schemas/DashboardInsight"
+    AssistantConversation:
+      type: object
+      required: [id, title, summary, updatedAt, icon, active]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        icon:
+          type: string
+        active:
+          type: boolean
+    AssistantMessage:
+      type: object
+      required: [id, role, body, createdAt, sourceIds]
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum: [assistant, user]
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        sourceIds:
+          type: array
+          items:
+            type: string
+    AssistantQuickAction:
+      type: object
+      required: [id, title, description, icon, tone, prompt]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+        tone:
+          type: string
+          enum: [ai, primary, neutral]
+        prompt:
+          type: string
+    AssistantContextCard:
+      type: object
+      required: [id, label, value, detail, icon]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        value:
+          type: string
+        detail:
+          type: string
+        icon:
+          type: string
+        href:
+          type: string
+    AssistantSource:
+      type: object
+      required: [id, title, type, detail, href, icon, tone, selected]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+        detail:
+          type: string
+        href:
+          type: string
+        icon:
+          type: string
+        tone:
+          type: string
+          enum: [ai, primary, warning]
+        selected:
+          type: boolean
+    AssistantUsage:
+      type: object
+      required: [used, limit, percent, resetLabel, confirmationMode, sourceAccessEnabled]
+      properties:
+        used:
+          type: integer
+        limit:
+          type: integer
+        percent:
+          type: integer
+        resetLabel:
+          type: string
+        confirmationMode:
+          $ref: "#/components/schemas/AiConfirmationMode"
+        sourceAccessEnabled:
+          type: boolean
+    AssistantSuggestedAction:
+      type: object
+      required: [id, label, detail, href, icon, kind, impact, status]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        detail:
+          type: string
+        href:
+          type: string
+        icon:
+          type: string
+        kind:
+          type: string
+          enum: [open_link, draft_lesson, draft_assessment, create_task]
+        impact:
+          type: string
+          enum: [low, medium, high]
+        status:
+          type: string
+          enum: [needs_confirmation, queued, draft]
+    AssistantAudit:
+      type: object
+      required: [id, provider, modelLabel, createdAt, confirmationMode, tenantScoped]
+      properties:
+        id:
+          type: string
+        provider:
+          type: string
+          enum: [demo-assistant]
+        modelLabel:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        confirmationMode:
+          $ref: "#/components/schemas/AiConfirmationMode"
+        tenantScoped:
+          type: boolean
+    AssistantWorkspaceResponse:
+      type: object
+      required: [workspace, user, permissions, conversations, activeConversationId, messages, quickActions, context, activeTags, sources, usage, suggestedPrompt, disclaimer]
+      properties:
+        workspace:
+          type: object
+        user:
+          type: object
+          required: [id, displayName, shortName, email]
+          properties:
+            id:
+              type: string
+            displayName:
+              type: string
+            shortName:
+              type: string
+            email:
+              type: string
+              format: email
+        permissions:
+          type: object
+          required: [canUseAi, canCreateLessonPlan, canCreateAssessment, canCreateTask]
+          properties:
+            canUseAi:
+              type: boolean
+            canCreateLessonPlan:
+              type: boolean
+            canCreateAssessment:
+              type: boolean
+            canCreateTask:
+              type: boolean
+        conversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssistantConversation"
+        activeConversationId:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssistantMessage"
+        quickActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssistantQuickAction"
+        context:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssistantContextCard"
+        activeTags:
+          type: array
+          items:
+            type: string
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssistantSource"
+        usage:
+          $ref: "#/components/schemas/AssistantUsage"
+        suggestedPrompt:
+          type: string
+        disclaimer:
+          type: string
+    CreateAssistantProposal:
+      type: object
+      required: [prompt]
+      properties:
+        prompt:
+          type: string
+          minLength: 3
+          maxLength: 1000
+        quickActionId:
+          type: string
+        sourceIds:
+          type: array
+          items:
+            type: string
+        contextTags:
+          type: array
+          items:
+            type: string
+    AssistantProposal:
+      type: object
+      required: [id, conversationId, userMessage, assistantMessage, suggestedActions, sourceIds, requiresConfirmation, audit]
+      properties:
+        id:
+          type: string
+        conversationId:
+          type: string
+        userMessage:
+          $ref: "#/components/schemas/AssistantMessage"
+        assistantMessage:
+          $ref: "#/components/schemas/AssistantMessage"
+        suggestedActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssistantSuggestedAction"
+        sourceIds:
+          type: array
+          items:
+            type: string
+        requiresConfirmation:
+          type: boolean
+        audit:
+          $ref: "#/components/schemas/AssistantAudit"
     TeacherClassListItem:
       type: object
       required: [id, displayName, subjectName, academicYearName, learnerCount]
@@ -1733,6 +1984,62 @@ paths:
                 $ref: "#/components/schemas/ApiError"
         "403":
           description: Missing dashboard permission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /ai/conversations:
+    get:
+      summary: Ask Pal assistant workspace for the active membership.
+      responses:
+        "200":
+          description: Tenant-scoped assistant conversations, context, sources, and usage.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantWorkspaceResponse"
+        "401":
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Missing AI permission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /ai/proposals:
+    post:
+      summary: Create a demo Ask Pal proposal from a prompt and selected sources.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAssistantProposal"
+      responses:
+        "201":
+          description: Demo assistant proposal.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssistantProposal"
+        "400":
+          description: Invalid prompt or source payload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "401":
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Missing AI permission.
           content:
             application/json:
               schema:

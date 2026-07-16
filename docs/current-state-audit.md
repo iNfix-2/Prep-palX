@@ -123,6 +123,8 @@ First-slice API routes:
 - `/api/v1/workspaces/select`
 - `/api/v1/settings`
 - `/api/v1/teacher/dashboard`
+- `/api/v1/ai/conversations`
+- `/api/v1/ai/proposals`
 - `/api/v1/help`
 - `/api/v1/help/requests`
 - `/api/v1/help/requests/[requestId]`
@@ -159,7 +161,7 @@ First-slice API routes:
 The current repo contains a scaffolded subset of the larger Stitch design:
 
 - Teacher Dashboard demo slice at `/`.
-- Ask Pal full-screen copilot at `/ask-pal`.
+- Ask Pal full-screen copilot demo slice at `/ask-pal`.
 - Dynamic teacher workspace renderer for sidebar modules.
 - Dynamic builder renderer for lesson and assessment draft flows.
 - First-slice My Classes and Class Overview screens.
@@ -181,7 +183,7 @@ The broader 88-screen Stitch design is not present as discrete source files in t
 
 ## 7. Existing API Calls
 
-No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The dashboard, tasks, help/support, settings, class, attendance, lesson-planner, assessment, question-bank, timetable, academic-calendar, resources, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/dashboard-service.ts`, `src/lib/server/tasks-service.ts`, `src/lib/server/help-service.ts`, `src/lib/server/settings-service.ts`, `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`, `src/lib/server/academic-calendar-service.ts`, `src/lib/server/resources-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
+Ask Pal now performs a client-side `fetch` to `/api/v1/ai/proposals` after the server-rendered page loads its initial assistant workspace through `src/lib/server/assistant-service.ts`. The dashboard, tasks, help/support, settings, class, attendance, lesson-planner, assessment, question-bank, timetable, academic-calendar, resources, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/dashboard-service.ts`, `src/lib/server/tasks-service.ts`, `src/lib/server/help-service.ts`, `src/lib/server/settings-service.ts`, `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`, `src/lib/server/academic-calendar-service.ts`, `src/lib/server/resources-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
 
 ## 8. Existing Mock Services and Mock Data
 
@@ -247,7 +249,7 @@ No deployment configuration files were found in the repo root.
 
 ## 16. Technical Debt Affecting Integration
 
-- Ask Pal and generic prototype screens are mock-data driven.
+- Legacy generic prototype screens and unversioned prototype APIs are mock-data driven.
 - API responses are not standardized.
 - Auth, tenancy, and authorization foundation exists for integrated `/api/v1` demo slices and is demo-backed.
 - No form validation standard.
@@ -265,7 +267,7 @@ No deployment configuration files were found in the repo root.
 - Server-side validation exists in the integrated demo slices, but no shared validation library or production persistence validation exists yet.
 - No rate limiting.
 - No secrets/env strategy.
-- Mock-only API routes still expose fixture data without permission checks; integrated `/api/v1` demo routes enforce session, tenant, and membership scope.
+- Mock-only prototype API routes still expose fixture data without permission checks; integrated `/api/v1` demo routes, including Ask Pal, enforce session, tenant, and membership scope.
 
 ## 18. Duplicate or Inconsistent Patterns
 

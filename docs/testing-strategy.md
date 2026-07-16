@@ -28,6 +28,10 @@ Implemented coverage:
 - Teacher Dashboard aggregates active-workspace classes, timetable events, tasks, and recent work.
 - Teacher Dashboard filters out same-tenant unassigned class data and cross-tenant data.
 - Admin Dashboard includes managed active-workspace classes and timetable events.
+- Unauthenticated `/api/v1/ai/conversations` returns `401`.
+- Ask Pal rejects memberships without `ai.use`.
+- Ask Pal assistant context and sources are filtered to the active tenant and visible teaching scope.
+- Ask Pal proposal creation validates prompt input and returns confirmation metadata for high-impact actions.
 - Unauthenticated `/api/v1/teacher/classes` returns `401`.
 - Demo teacher login sets session/workspace cookies.
 - `/api/v1/me` returns active user and workspace.
@@ -129,36 +133,37 @@ Initial critical path is partially covered by the integration test:
 1. Login.
 2. Workspace selection.
 3. Teacher Dashboard.
-4. Settings.
-5. My Classes.
-6. Class Overview.
-7. My Tasks.
-8. Task Detail.
-9. Help Centre.
-10. Support Request Detail.
-11. Attendance.
-12. Attendance Register.
-13. Lesson Planner.
-14. New Lesson Plan.
-15. Lesson Plan Detail.
-16. Assessments.
-17. New Assessment.
-18. Assessment Detail.
-19. Question Bank.
-20. New Question.
-21. Question Detail.
-22. Timetable.
-23. Timetable Event.
-24. Academic Calendar.
-25. Calendar Event.
-26. Resources.
-27. Resource Detail.
-28. Gradebook.
-29. Gradebook Sheet.
-30. Reports.
-31. Class Report.
-32. Approvals.
-33. Approval Detail.
+4. Ask Pal.
+5. Settings.
+6. My Classes.
+7. Class Overview.
+8. My Tasks.
+9. Task Detail.
+10. Help Centre.
+11. Support Request Detail.
+12. Attendance.
+13. Attendance Register.
+14. Lesson Planner.
+15. New Lesson Plan.
+16. Lesson Plan Detail.
+17. Assessments.
+18. New Assessment.
+19. Assessment Detail.
+20. Question Bank.
+21. New Question.
+22. Question Detail.
+23. Timetable.
+24. Timetable Event.
+25. Academic Calendar.
+26. Calendar Event.
+27. Resources.
+28. Resource Detail.
+29. Gradebook.
+30. Gradebook Sheet.
+31. Reports.
+32. Class Report.
+33. Approvals.
+34. Approval Detail.
 
 Future paths:
 

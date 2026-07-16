@@ -11,6 +11,7 @@ First vertical-slice demo implementation exists:
 - `src/lib/security/permissions.ts` defines the first permission set.
 - `src/lib/server/classes-service.ts` enforces tenant and class permissions.
 - `src/lib/server/settings-service.ts` enforces self-account and workspace selection permissions.
+- `src/lib/server/assistant-service.ts` enforces `ai.use` and tenant-scoped assistant sources.
 
 This is not production authentication. Passwords and sessions are deterministic demo
 fixtures in `src/lib/server/demo-store.ts`.

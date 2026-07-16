@@ -93,6 +93,55 @@ test("admin dashboard can summarize managed workspace classes", async () => {
   assert.ok(scheduleIds.includes("timetable-p5-practical"));
 });
 
+test("ask pal slice scopes assistant context and proposals", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/ai/conversations`);
+  assert.equal(unauthenticated.status, 401);
+
+  const riverCookie = await login("river.teacher@truth.test", "password");
+  const forbiddenAi = await fetchJson("/api/v1/ai/conversations", riverCookie);
+  assert.equal(forbiddenAi.response.status, 403);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const assistant = await getJson("/api/v1/ai/conversations", teacherCookie);
+
+  assert.equal(assistant.user.email, "mrs.adeyemi@truth.test");
+  assert.equal(assistant.workspace.id, "school-truth");
+  assert.equal(assistant.permissions.canUseAi, true);
+  assert.ok(assistant.activeTags.includes("Primary 4"));
+  assert.ok(assistant.activeTags.includes("Mathematics"));
+  assert.ok(assistant.sources.some((source) => source.href === "/timetable/timetable-p4-fractions"));
+  assert.ok(!assistant.sources.some((source) => source.title.includes("Primary 5")));
+
+  const invalidProposal = await postJson("/api/v1/ai/proposals", teacherCookie, {
+    prompt: "",
+  });
+  assert.equal(invalidProposal.response.status, 400);
+
+  const proposal = await postJson("/api/v1/ai/proposals", teacherCookie, {
+    prompt: "Prepare my next lesson with support steps.",
+    quickActionId: "prepare-next-lesson",
+    sourceIds: assistant.sources.slice(0, 2).map((source) => source.id),
+  });
+  assert.equal(proposal.response.status, 201);
+  assert.equal(proposal.body.data.requiresConfirmation, true);
+  assert.equal(proposal.body.data.suggestedActions[0].href, "/lesson-planner/new");
+  assert.match(proposal.body.data.assistantMessage.body, /Primary 4 Mathematics/);
+
+  const askPalPage = await fetch(`${baseUrl}/ask-pal`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(askPalPage.status, 200);
+  const askPalHtml = await askPalPage.text();
+  assert.match(askPalHtml, /What are we preparing today/);
+  assert.match(askPalHtml, /Primary 4 Mathematics/);
+
+  const forbiddenPage = await fetch(`${baseUrl}/ask-pal`, {
+    headers: { cookie: riverCookie },
+  });
+  assert.equal(forbiddenPage.status, 200);
+  assert.match(await forbiddenPage.text(), /Permission required/);
+});
+
 test("teacher classes vertical slice enforces auth, permissions, and tenant scope", async () => {
   const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/classes`);
   assert.equal(unauthenticated.status, 401);

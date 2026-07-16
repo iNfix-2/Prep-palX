@@ -411,6 +411,22 @@ export interface DemoApprovalRequest {
   notes: DemoApprovalNote[];
 }
 
+export type DemoAiActionKind = "open_link" | "draft_lesson" | "draft_assessment" | "create_task";
+export type DemoAiActionImpact = "low" | "medium" | "high";
+
+export interface DemoAiProposal {
+  id: string;
+  workspaceId: string;
+  membershipId: string;
+  conversationId: string;
+  prompt: string;
+  response: string;
+  sourceIds: string[];
+  actionKind: DemoAiActionKind;
+  actionImpact: DemoAiActionImpact;
+  createdAt: string;
+}
+
 export interface DemoClassTask {
   id: string;
   title: string;
@@ -596,6 +612,8 @@ export const demoSessions: DemoSession[] = [
   { token: "session-admin-truth", userId: "user-admin-truth" },
   { token: "session-river-teacher", userId: "user-river" },
 ];
+
+export const demoAiProposals: DemoAiProposal[] = [];
 
 export const demoAccountSettings: DemoAccountSettings[] = [
   {
@@ -2620,6 +2638,19 @@ export function createDemoQuestion(
 
   demoQuestions.push(question);
   return question;
+}
+
+export function createDemoAiProposal(
+  input: Omit<DemoAiProposal, "id" | "createdAt"> & { createdAt?: string },
+) {
+  const proposal: DemoAiProposal = {
+    ...input,
+    id: `ai-proposal-${demoAiProposals.length + 1}`,
+    createdAt: input.createdAt ?? "2026-07-16T15:45:00.000Z",
+  };
+
+  demoAiProposals.push(proposal);
+  return proposal;
 }
 
 export function getDemoAccountSettings(membershipId: string) {
