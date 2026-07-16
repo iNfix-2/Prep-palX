@@ -52,6 +52,11 @@ Implemented coverage:
 - Question detail follows same-tenant `403` and cross-tenant `404` rules.
 - Question creation validates required fields, multiple-choice options, and assigned-class scope.
 - Admin membership can view all questions in the active tenant.
+- Unauthenticated `/api/v1/teacher/timetable` returns `401`.
+- Teacher timetable events are filtered to assigned classes and owned workspace events.
+- Timetable event detail follows same-tenant `403` and cross-tenant `404` rules.
+- Timetable date filtering validates `YYYY-MM-DD`.
+- Admin membership can view all timetable events in the active tenant.
 - Unauthenticated `/api/v1/teacher/gradebooks` returns `401`.
 - Teacher gradebook sheets are filtered to assigned classes.
 - Gradebook sheet detail follows same-tenant `403` and cross-tenant `404` rules.
@@ -107,12 +112,14 @@ Initial critical path is partially covered by the integration test:
 13. Question Bank.
 14. New Question.
 15. Question Detail.
-16. Gradebook.
-17. Gradebook Sheet.
-18. Reports.
-19. Class Report.
-20. Approvals.
-21. Approval Detail.
+16. Timetable.
+17. Timetable Event.
+18. Gradebook.
+19. Gradebook Sheet.
+20. Reports.
+21. Class Report.
+22. Approvals.
+23. Approval Detail.
 
 Future paths:
 

@@ -137,6 +137,27 @@ export interface DemoQuestion {
   updatedAt: string;
 }
 
+export type DemoTimetableEventType = "lesson" | "assessment" | "duty" | "meeting";
+export type DemoTimetableEventStatus = "scheduled" | "in_progress" | "completed" | "conflict";
+export type DemoTimetablePreparationStatus = "ready" | "needs_preparation" | "blocked";
+
+export interface DemoTimetableEvent {
+  id: string;
+  workspaceId: string;
+  classId?: string;
+  title: string;
+  type: DemoTimetableEventType;
+  status: DemoTimetableEventStatus;
+  preparationStatus: DemoTimetablePreparationStatus;
+  startAt: string;
+  endAt: string;
+  location: string;
+  notes: string;
+  teacherMembershipId: string;
+  linkedLessonPlanId?: string;
+  linkedAssessmentId?: string;
+}
+
 export type DemoGradebookScoreStatus = "scored" | "missing" | "excused";
 
 export interface DemoGradebookScore {
@@ -289,6 +310,7 @@ export const demoMemberships: DemoMembership[] = [
       "dashboard.view",
       "workspace.select",
       "class.view_assigned",
+      "timetable.view",
       "attendance.record",
       "attendance.view_reports",
       "lesson.view",
@@ -316,6 +338,7 @@ export const demoMemberships: DemoMembership[] = [
       "workspace.select",
       "class.view_assigned",
       "class.manage",
+      "timetable.view",
       "attendance.record",
       "attendance.view_reports",
       "lesson.view",
@@ -344,6 +367,7 @@ export const demoMemberships: DemoMembership[] = [
       "dashboard.view",
       "workspace.select",
       "class.view_assigned",
+      "timetable.view",
       "attendance.record",
       "lesson.view",
       "lesson.create",
@@ -970,6 +994,98 @@ export const demoQuestions: DemoQuestion[] = [
   },
 ];
 
+export const demoTimetableEvents: DemoTimetableEvent[] = [
+  {
+    id: "timetable-staff-briefing",
+    workspaceId: "school-truth",
+    title: "Morning Staff Briefing",
+    type: "meeting",
+    status: "completed",
+    preparationStatus: "ready",
+    startAt: "2026-07-16T07:45:00.000Z",
+    endAt: "2026-07-16T08:05:00.000Z",
+    location: "Staff Room",
+    notes: "Daily notices, duty rota check, and assessment moderation reminders.",
+    teacherMembershipId: "mem-truth-teacher-ade",
+  },
+  {
+    id: "timetable-p4-fractions",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    title: "Equivalent Fractions",
+    type: "lesson",
+    status: "scheduled",
+    preparationStatus: "needs_preparation",
+    startAt: "2026-07-16T09:20:00.000Z",
+    endAt: "2026-07-16T10:00:00.000Z",
+    location: "Room 4B",
+    notes: "Bring fraction strips and reuse the exit-ticket misconception list.",
+    teacherMembershipId: "mem-truth-teacher-ade",
+    linkedLessonPlanId: "lesson-p4-fractions",
+  },
+  {
+    id: "timetable-p3-reading",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    title: "Main Idea in Short Passages",
+    type: "lesson",
+    status: "scheduled",
+    preparationStatus: "ready",
+    startAt: "2026-07-16T11:00:00.000Z",
+    endAt: "2026-07-16T11:35:00.000Z",
+    location: "Room 3A",
+    notes: "Use the term reader passage and collect one exit response before plenary.",
+    teacherMembershipId: "mem-truth-teacher-ade",
+    linkedLessonPlanId: "lesson-p3-reading",
+  },
+  {
+    id: "timetable-p4-quick-check",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    title: "Fractions Quick Check Prep",
+    type: "assessment",
+    status: "scheduled",
+    preparationStatus: "blocked",
+    startAt: "2026-07-16T13:15:00.000Z",
+    endAt: "2026-07-16T13:40:00.000Z",
+    location: "Room 4B",
+    notes: "Resolve one visual support item before the assessment moves to review.",
+    teacherMembershipId: "mem-truth-teacher-ade",
+    linkedAssessmentId: "assessment-p4-fractions",
+  },
+  {
+    id: "timetable-p5-practical",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    title: "Evaporation Practical Setup",
+    type: "lesson",
+    status: "scheduled",
+    preparationStatus: "ready",
+    startAt: "2026-07-16T14:00:00.000Z",
+    endAt: "2026-07-16T14:45:00.000Z",
+    location: "Lab 1",
+    notes: "Admin-owned science event used for class-scope checks.",
+    teacherMembershipId: "mem-truth-admin",
+    linkedLessonPlanId: "lesson-p5-evaporation",
+    linkedAssessmentId: "assessment-p5-matter",
+  },
+  {
+    id: "timetable-river-community",
+    workspaceId: "school-river",
+    classId: "class-river-history",
+    title: "Community Helpers",
+    type: "lesson",
+    status: "scheduled",
+    preparationStatus: "ready",
+    startAt: "2026-07-16T10:30:00.000Z",
+    endAt: "2026-07-16T11:00:00.000Z",
+    location: "Room 2C",
+    notes: "Tenant isolation fixture for timetable scope checks.",
+    teacherMembershipId: "mem-river-teacher",
+    linkedLessonPlanId: "lesson-river-community",
+  },
+];
+
 export const demoGradebookScores: DemoGradebookScore[] = [
   {
     id: "score-p4-fractions-ada",
@@ -1302,6 +1418,10 @@ export function getApprovalRequest(approvalId: string) {
 
 export function getQuestion(questionId: string) {
   return demoQuestions.find((question) => question.id === questionId) ?? null;
+}
+
+export function getTimetableEvent(eventId: string) {
+  return demoTimetableEvents.find((event) => event.id === eventId) ?? null;
 }
 
 export function upsertDemoAttendanceRecords(

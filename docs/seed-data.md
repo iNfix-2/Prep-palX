@@ -24,6 +24,9 @@ fixtures in `src/lib/server/demo-store.ts`.
   assessment content, and a cross-tenant assessment.
 - Questions cover assigned teacher reusable items, in-review items, same-tenant
   admin-owned question content, and a cross-tenant question fixture.
+- Timetable events cover teacher-owned workspace events, assigned class lessons,
+  linked assessments, same-tenant admin-owned class events, and a cross-tenant
+  event fixture.
 - Gradebook scores cover partial assigned sheets, same-tenant admin sheets, missing
   scores, and a cross-tenant score fixture.
 - Report comments cover ready and draft learner comments for assigned classes,

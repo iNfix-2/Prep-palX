@@ -443,6 +443,84 @@ components:
           type: string
         explanation:
           type: string
+    TimetableEventType:
+      type: string
+      enum: [lesson, assessment, duty, meeting]
+    TimetableEventStatus:
+      type: string
+      enum: [scheduled, in_progress, completed, conflict]
+    TimetablePreparationStatus:
+      type: string
+      enum: [ready, needs_preparation, blocked]
+    TimetableEvent:
+      type: object
+      required: [id, title, type, status, preparationStatus, startAt, endAt, location, notes]
+      properties:
+        id:
+          type: string
+        classId:
+          type: string
+        classDisplayName:
+          type: string
+        subjectName:
+          type: string
+        gradeName:
+          type: string
+        title:
+          type: string
+        type:
+          $ref: "#/components/schemas/TimetableEventType"
+        status:
+          $ref: "#/components/schemas/TimetableEventStatus"
+        preparationStatus:
+          $ref: "#/components/schemas/TimetablePreparationStatus"
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+        location:
+          type: string
+        notes:
+          type: string
+        linkedLessonPlanId:
+          type: string
+        linkedAssessmentId:
+          type: string
+    TimetableEventDetail:
+      allOf:
+        - $ref: "#/components/schemas/TimetableEvent"
+        - type: object
+          required: [teacherName]
+          properties:
+            teacherName:
+              type: string
+            classHref:
+              type: string
+            lessonPlanHref:
+              type: string
+            assessmentHref:
+              type: string
+    TeacherTimetableResponse:
+      type: object
+      required: [workspace, selectedDate, permissions, events]
+      properties:
+        workspace:
+          type: object
+        selectedDate:
+          type: string
+          format: date
+        permissions:
+          type: object
+          required: [canUseAi]
+          properties:
+            canUseAi:
+              type: boolean
+        events:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimetableEvent"
     GradebookSheetStatus:
       type: string
       enum: [complete, partial, not_started]
@@ -825,6 +903,28 @@ paths:
           description: Unauthenticated.
         "403":
           description: Missing question permission.
+  /teacher/timetable:
+    get:
+      summary: List timetable events for the authenticated teacher.
+      parameters:
+        - in: query
+          name: date
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Timetable events.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeacherTimetableResponse"
+        "400":
+          description: Invalid date filter.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing timetable permission.
   /teacher/gradebooks:
     get:
       summary: List gradebook sheets for accessible assessments.
@@ -981,6 +1081,28 @@ paths:
           description: Question is outside permitted class scope.
         "404":
           description: Question not found in active tenant.
+  /timetable/events/{eventId}:
+    get:
+      summary: Get timetable event detail if the user has access.
+      parameters:
+        - in: path
+          name: eventId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Timetable event detail.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TimetableEventDetail"
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Timetable event is outside permitted class scope.
+        "404":
+          description: Timetable event not found in active tenant.
   /gradebooks/{assessmentId}:
     get:
       summary: Get gradebook sheet for an accessible assessment.

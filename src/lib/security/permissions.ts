@@ -3,6 +3,7 @@ export const permissions = [
   "workspace.select",
   "class.view_assigned",
   "class.manage",
+  "timetable.view",
   "attendance.record",
   "attendance.view_reports",
   "lesson.view",

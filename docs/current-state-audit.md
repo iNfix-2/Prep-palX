@@ -85,6 +85,8 @@ UI routes:
 - `/question-bank` via `src/app/(teacher)/question-bank/page.tsx`
 - `/question-bank/new` via `src/app/(teacher)/question-bank/new/page.tsx`
 - `/question-bank/[questionId]` via `src/app/(teacher)/question-bank/[questionId]/page.tsx`
+- `/timetable` via `src/app/(teacher)/timetable/page.tsx`
+- `/timetable/[eventId]` via `src/app/(teacher)/timetable/[eventId]/page.tsx`
 - `/gradebook` via `src/app/(teacher)/gradebook/page.tsx`
 - `/gradebook/[assessmentId]` via `src/app/(teacher)/gradebook/[assessmentId]/page.tsx`
 - `/reports` via `src/app/(teacher)/reports/page.tsx`
@@ -123,6 +125,8 @@ First-slice API routes:
 - `/api/v1/teacher/questions`
 - `/api/v1/questions`
 - `/api/v1/questions/[questionId]`
+- `/api/v1/teacher/timetable`
+- `/api/v1/timetable/events/[eventId]`
 - `/api/v1/teacher/gradebooks`
 - `/api/v1/gradebooks/[assessmentId]`
 - `/api/v1/teacher/reports`
@@ -143,6 +147,7 @@ The current repo contains a scaffolded subset of the larger Stitch design:
 - Lesson Planner, New Lesson Plan, and Lesson Plan Detail demo slice.
 - Assessments, New Assessment, and Assessment Detail demo slice.
 - Question Bank, New Question, and Question Detail demo slice.
+- Timetable and Timetable Event demo slice.
 - Gradebook and Gradebook Sheet demo slice.
 - Reports and Class Report demo slice.
 - Approvals and Approval Detail demo slice.
@@ -151,7 +156,7 @@ The broader 88-screen Stitch design is not present as discrete source files in t
 
 ## 7. Existing API Calls
 
-No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class, attendance, lesson-planner, assessment, question-bank, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
+No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class, attendance, lesson-planner, assessment, question-bank, timetable, gradebook, reports, and approvals slices use server components/actions calling `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`, `src/lib/server/gradebook-service.ts`, `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
 
 ## 8. Existing Mock Services and Mock Data
 
@@ -186,7 +191,7 @@ First-slice permission enforcement exists:
 - `src/lib/security/permissions.ts`
 - `src/lib/server/classes-service.ts`
 
-Implemented permissions include `class.view_assigned`, `class.manage`, `lesson.create`, `assessment.view`, `assessment.create`, `assessment.mark`, `question.view`, `question.manage`, `gradebook.view`, and `ai.use`.
+Implemented permissions include `class.view_assigned`, `class.manage`, `timetable.view`, `lesson.create`, `assessment.view`, `assessment.create`, `assessment.mark`, `question.view`, `question.manage`, `gradebook.view`, and `ai.use`.
 Attendance adds `attendance.record` and `attendance.view_reports`.
 Lesson planning adds `lesson.view` and uses `lesson.create`.
 Assessment creation and detail use `assessment.view` and `assessment.create`.
@@ -208,7 +213,7 @@ No database models, migrations, seed files, or schema tooling are present.
 
 ## 14. Existing Tests
 
-`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, attendance register filtering and save, lesson plan filtering and create, assessment filtering and create, question bank filtering and create, gradebook filtering and score save, report filtering and comment save, approval filtering and reviewer decisions, admin access, `403` for same-tenant unassigned access, and `404` for cross-tenant access.
+`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, attendance register filtering and save, lesson plan filtering and create, assessment filtering and create, question bank filtering and create, timetable filtering and detail access, gradebook filtering and score save, report filtering and comment save, approval filtering and reviewer decisions, admin access, `403` for same-tenant unassigned access, and `404` for cross-tenant access.
 
 ## 15. Existing Deployment Configuration
 
@@ -263,7 +268,7 @@ Reusable candidates:
 ## 21. Screens with Partial Backend Integration
 
 Integrated demo route handlers exist for classes, attendance, lesson planning,
-assessments, question bank, gradebook, reports, and approvals. No screen is
+assessments, question bank, timetable, gradebook, reports, and approvals. No screen is
 integrated with a real backend or database.
 
 ## 22. Missing Infrastructure Required Before Integration

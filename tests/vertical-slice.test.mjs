@@ -532,6 +532,78 @@ test("admin membership can view all questions in the active workspace", async ()
   assert.match(scienceQuestion.body.data.prompt, /sunny day/);
 });
 
+test("timetable slice scopes teacher schedule events", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/timetable`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const timetable = await getJson(
+    "/api/v1/teacher/timetable?date=2026-07-16",
+    teacherCookie,
+  );
+  const eventIds = timetable.events.map((event) => event.id);
+
+  assert.deepEqual(eventIds, [
+    "timetable-staff-briefing",
+    "timetable-p4-fractions",
+    "timetable-p3-reading",
+    "timetable-p4-quick-check",
+  ]);
+
+  const assignedEvent = await fetchJson(
+    "/api/v1/timetable/events/timetable-p4-fractions",
+    teacherCookie,
+  );
+  assert.equal(assignedEvent.response.status, 200);
+  assert.equal(assignedEvent.body.data.title, "Equivalent Fractions");
+  assert.equal(assignedEvent.body.data.lessonPlanHref, "/lesson-planner/lesson-p4-fractions");
+
+  const unassignedEvent = await fetchJson(
+    "/api/v1/timetable/events/timetable-p5-practical",
+    teacherCookie,
+  );
+  assert.equal(unassignedEvent.response.status, 403);
+
+  const crossTenantEvent = await fetchJson(
+    "/api/v1/timetable/events/timetable-river-community",
+    teacherCookie,
+  );
+  assert.equal(crossTenantEvent.response.status, 404);
+
+  const invalidDate = await fetchJson(
+    "/api/v1/teacher/timetable?date=July-16",
+    teacherCookie,
+  );
+  assert.equal(invalidDate.response.status, 400);
+
+  const timetablePage = await fetch(`${baseUrl}/timetable`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(timetablePage.status, 200);
+  assert.match(await timetablePage.text(), /Equivalent Fractions/);
+
+  const detailPage = await fetch(`${baseUrl}/timetable/timetable-p4-fractions`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(detailPage.status, 200);
+  assert.match(await detailPage.text(), /Preparation Notes/);
+});
+
+test("admin membership can view all timetable events in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const timetable = await getJson("/api/v1/teacher/timetable", adminCookie);
+  const eventIds = timetable.events.map((event) => event.id);
+
+  assert.ok(eventIds.includes("timetable-p5-practical"));
+
+  const scienceEvent = await fetchJson(
+    "/api/v1/timetable/events/timetable-p5-practical",
+    adminCookie,
+  );
+  assert.equal(scienceEvent.response.status, 200);
+  assert.equal(scienceEvent.body.data.title, "Evaporation Practical Setup");
+});
+
 test("gradebook slice records scores with the same tenant and assignment rules", async () => {
   const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/gradebooks`);
   assert.equal(unauthenticated.status, 401);
