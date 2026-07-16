@@ -46,6 +46,53 @@ test.after(async () => {
   }
 });
 
+test("teacher dashboard slice summarizes active workspace scope", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/dashboard`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const dashboard = await getJson("/api/v1/teacher/dashboard", teacherCookie);
+
+  assert.equal(dashboard.user.email, "mrs.adeyemi@truth.test");
+  assert.equal(dashboard.workspace.id, "school-truth");
+  assert.equal(dashboard.permissions.canUseAi, true);
+
+  const classIds = dashboard.classProgress.map((classItem) => classItem.id);
+  assert.ok(classIds.includes("class-p4-math"));
+  assert.ok(classIds.includes("class-p3-english"));
+  assert.ok(!classIds.includes("class-p5-science"));
+
+  const scheduleIds = dashboard.schedule.map((event) => event.id);
+  assert.ok(scheduleIds.includes("timetable-p4-fractions"));
+  assert.ok(scheduleIds.includes("timetable-p3-reading"));
+  assert.ok(!scheduleIds.includes("timetable-p5-practical"));
+  assert.ok(!scheduleIds.includes("timetable-river-community"));
+
+  const urgentTaskIds = dashboard.urgentTasks.map((task) => task.id);
+  assert.ok(urgentTaskIds.includes("task-p3-score-entry"));
+  assert.ok(!urgentTaskIds.includes("task-p5-lab-check"));
+
+  const dashboardPage = await fetch(`${baseUrl}/`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(dashboardPage.status, 200);
+  const dashboardHtml = await dashboardPage.text();
+  assert.match(dashboardHtml, /Good morning/);
+  assert.match(dashboardHtml, /Mrs\. Adeyemi/);
+  assert.match(dashboardHtml, /Schedule/);
+  assert.match(dashboardHtml, /Primary 4 Mathematics/);
+});
+
+test("admin dashboard can summarize managed workspace classes", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const dashboard = await getJson("/api/v1/teacher/dashboard", adminCookie);
+  const classIds = dashboard.classProgress.map((classItem) => classItem.id);
+  const scheduleIds = dashboard.schedule.map((event) => event.id);
+
+  assert.ok(classIds.includes("class-p5-science"));
+  assert.ok(scheduleIds.includes("timetable-p5-practical"));
+});
+
 test("teacher classes vertical slice enforces auth, permissions, and tenant scope", async () => {
   const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/classes`);
   assert.equal(unauthenticated.status, 401);

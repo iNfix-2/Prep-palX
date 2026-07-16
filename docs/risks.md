@@ -2,7 +2,7 @@
 
 - Mock UI data may not match eventual backend entities.
 - Authentication and tenant isolation exist only for the demo-backed `/api/v1`
-  tasks, help/support, settings, classes, attendance, lesson-planner, assessment, question-bank, timetable,
+  dashboard, tasks, help/support, settings, classes, attendance, lesson-planner, assessment, question-bank, timetable,
   academic calendar, resources, gradebook, reports, and approvals slices;
   production auth, durable sessions, audit, and database-backed
   tenant checks are still required.

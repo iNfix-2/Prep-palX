@@ -69,6 +69,7 @@ Preferred production approach:
 
 ## Permission Examples
 
+- `dashboard.view`
 - `task.view`
 - `task.manage`
 - `account.manage_self`

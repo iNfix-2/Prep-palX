@@ -192,6 +192,195 @@ components:
           $ref: "#/components/schemas/AiConfirmationMode"
         aiSourceAccess:
           type: boolean
+    DashboardTone:
+      type: string
+      enum: [primary, review, approved, changes, neutral, ai]
+    DashboardMetric:
+      type: object
+      required: [id, label, value, detail, icon, tone]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        value:
+          type: string
+        detail:
+          type: string
+        icon:
+          type: string
+        tone:
+          $ref: "#/components/schemas/DashboardTone"
+    DashboardAction:
+      type: object
+      required: [id, label, detail, href, icon, variant]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        detail:
+          type: string
+        href:
+          type: string
+        icon:
+          type: string
+        variant:
+          type: string
+          enum: [primary, ai, secondary]
+    DashboardScheduleItem:
+      type: object
+      required: [id, title, detail, timeLabel, location, icon, variant]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        timeLabel:
+          type: string
+        location:
+          type: string
+        href:
+          type: string
+        icon:
+          type: string
+        variant:
+          type: string
+          enum: [default, current, break]
+    DashboardTask:
+      type: object
+      required: [id, title, detail, href, priorityLabel, tone]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        href:
+          type: string
+        priorityLabel:
+          type: string
+        tone:
+          $ref: "#/components/schemas/DashboardTone"
+        sourceLabel:
+          type: string
+    DashboardClassProgress:
+      type: object
+      required: [id, title, href, subject, learnerCount, readinessPercent, curriculumProgressPercent, attentionCount]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        href:
+          type: string
+        subject:
+          type: string
+        learnerCount:
+          type: integer
+        readinessPercent:
+          type: integer
+        curriculumProgressPercent:
+          type: integer
+        attentionCount:
+          type: integer
+    DashboardRecentWork:
+      type: object
+      required: [id, title, detail, href, icon, updatedAt]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        detail:
+          type: string
+        href:
+          type: string
+        icon:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+    DashboardInsight:
+      type: object
+      required: [message, actionLabel, href]
+      properties:
+        message:
+          type: string
+        actionLabel:
+          type: string
+        href:
+          type: string
+    TeacherDashboardResponse:
+      type: object
+      required: [workspace, user, today, generatedAt, permissions, metrics, actions, schedule, urgentTasks, classProgress, recentWork, insight]
+      properties:
+        workspace:
+          type: object
+        user:
+          type: object
+          required: [id, displayName, shortName, email]
+          properties:
+            id:
+              type: string
+            displayName:
+              type: string
+            shortName:
+              type: string
+            email:
+              type: string
+              format: email
+        today:
+          type: string
+          format: date
+        generatedAt:
+          type: string
+          format: date-time
+        permissions:
+          type: object
+          required: [canUseAi, canCreateAssessment, canCreateLessonPlan, canViewTasks, canViewSupport]
+          properties:
+            canUseAi:
+              type: boolean
+            canCreateAssessment:
+              type: boolean
+            canCreateLessonPlan:
+              type: boolean
+            canViewTasks:
+              type: boolean
+            canViewSupport:
+              type: boolean
+        metrics:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardMetric"
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardAction"
+        nextEvent:
+          $ref: "#/components/schemas/DashboardScheduleItem"
+        schedule:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardScheduleItem"
+        urgentTasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardTask"
+        classProgress:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardClassProgress"
+        recentWork:
+          type: array
+          items:
+            $ref: "#/components/schemas/DashboardRecentWork"
+        insight:
+          $ref: "#/components/schemas/DashboardInsight"
     TeacherClassListItem:
       type: object
       required: [id, displayName, subjectName, academicYearName, learnerCount]
@@ -1522,6 +1711,28 @@ paths:
                 $ref: "#/components/schemas/ApiError"
         "403":
           description: Missing account settings permission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+  /teacher/dashboard:
+    get:
+      summary: Aggregated teacher dashboard for the active workspace.
+      responses:
+        "200":
+          description: Teacher dashboard summary.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeacherDashboardResponse"
+        "401":
+          description: Unauthenticated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        "403":
+          description: Missing dashboard permission.
           content:
             application/json:
               schema:

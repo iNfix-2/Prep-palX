@@ -24,6 +24,10 @@ Cover:
 
 Implemented coverage:
 
+- Unauthenticated `/api/v1/teacher/dashboard` returns `401`.
+- Teacher Dashboard aggregates active-workspace classes, timetable events, tasks, and recent work.
+- Teacher Dashboard filters out same-tenant unassigned class data and cross-tenant data.
+- Admin Dashboard includes managed active-workspace classes and timetable events.
 - Unauthenticated `/api/v1/teacher/classes` returns `401`.
 - Demo teacher login sets session/workspace cookies.
 - `/api/v1/me` returns active user and workspace.
@@ -124,36 +128,37 @@ Initial critical path is partially covered by the integration test:
 
 1. Login.
 2. Workspace selection.
-3. Settings.
-4. My Classes.
-5. Class Overview.
-6. My Tasks.
-7. Task Detail.
-8. Help Centre.
-9. Support Request Detail.
-10. Attendance.
-11. Attendance Register.
-12. Lesson Planner.
-13. New Lesson Plan.
-14. Lesson Plan Detail.
-15. Assessments.
-16. New Assessment.
-17. Assessment Detail.
-18. Question Bank.
-19. New Question.
-20. Question Detail.
-21. Timetable.
-22. Timetable Event.
-23. Academic Calendar.
-24. Calendar Event.
-25. Resources.
-26. Resource Detail.
-27. Gradebook.
-28. Gradebook Sheet.
-29. Reports.
-30. Class Report.
-31. Approvals.
-32. Approval Detail.
+3. Teacher Dashboard.
+4. Settings.
+5. My Classes.
+6. Class Overview.
+7. My Tasks.
+8. Task Detail.
+9. Help Centre.
+10. Support Request Detail.
+11. Attendance.
+12. Attendance Register.
+13. Lesson Planner.
+14. New Lesson Plan.
+15. Lesson Plan Detail.
+16. Assessments.
+17. New Assessment.
+18. Assessment Detail.
+19. Question Bank.
+20. New Question.
+21. Question Detail.
+22. Timetable.
+23. Timetable Event.
+24. Academic Calendar.
+25. Calendar Event.
+26. Resources.
+27. Resource Detail.
+28. Gradebook.
+29. Gradebook Sheet.
+30. Reports.
+31. Class Report.
+32. Approvals.
+33. Approval Detail.
 
 Future paths:
 
