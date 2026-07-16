@@ -38,14 +38,23 @@ export function AssessmentDetail({
             {view.typeLabel} for {view.subjectLabel}
           </p>
         </div>
-        <span
-          className={cn(
-            "w-fit rounded-full border px-3 py-1.5 text-body-md font-bold",
-            statusClasses[view.statusTone],
-          )}
-        >
-          {view.statusLabel}
-        </span>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/gradebook/${view.id}`}
+            className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-body-md font-semibold text-on-primary transition-colors hover:bg-primary-hover"
+          >
+            <Icon name="grading" className="text-[18px]" />
+            Enter scores
+          </Link>
+          <span
+            className={cn(
+              "inline-flex h-10 w-fit items-center rounded-full border px-3 text-body-md font-bold",
+              statusClasses[view.statusTone],
+            )}
+          >
+            {view.statusLabel}
+          </span>
+        </div>
       </header>
 
       {saved && (
@@ -56,7 +65,7 @@ export function AssessmentDetail({
 
       <section className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <SummaryCard icon="calendar_today" label="Assessment date" value={view.scheduledLabel} />
-        <SummaryCard icon="event_available" label="Due date" value={view.dueLabel} />
+        <SummaryCard icon="calendar_month" label="Due date" value={view.dueLabel} />
         <SummaryCard icon="schedule" label="Duration" value={view.durationLabel} />
         <SummaryCard icon="grading" label="Marks" value={view.marksLabel} />
       </section>

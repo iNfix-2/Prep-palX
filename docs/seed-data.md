@@ -22,6 +22,8 @@ fixtures in `src/lib/server/demo-store.ts`.
   plans, and a cross-tenant plan.
 - Assessments cover assigned teacher drafts, in-review work, same-tenant admin
   assessment content, and a cross-tenant assessment.
+- Gradebook scores cover partial assigned sheets, same-tenant admin sheets, missing
+  scores, and a cross-tenant score fixture.
 
 Required seed scenarios:
 

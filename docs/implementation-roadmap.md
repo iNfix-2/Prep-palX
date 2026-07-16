@@ -49,9 +49,10 @@ Objective: assessment creation, marking, moderation, gradebook.
 
 Dependencies: Phase A-C.
 
-Complexity: extra-large. Status: assessment list, draft creation, and assessment
-detail demo slice implemented with in-memory seed data. Marking, moderation,
-question bank integration, gradebook, and production persistence are not started.
+Complexity: extra-large. Status: assessment list, draft creation, assessment
+detail, gradebook list, and score-entry demo slices are implemented with
+in-memory seed data. Moderation, question bank integration, report calculations,
+and production persistence are not started.
 
 ## Phase E: Reporting
 

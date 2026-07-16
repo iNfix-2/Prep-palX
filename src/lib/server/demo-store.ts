@@ -113,6 +113,22 @@ export interface DemoAssessment {
   updatedAt: string;
 }
 
+export type DemoGradebookScoreStatus = "scored" | "missing" | "excused";
+
+export interface DemoGradebookScore {
+  id: string;
+  workspaceId: string;
+  assessmentId: string;
+  classId: string;
+  learnerId: string;
+  score: number | null;
+  maxScore: number;
+  status: DemoGradebookScoreStatus;
+  feedback: string;
+  markedByMembershipId?: string;
+  updatedAt: string;
+}
+
 export interface DemoClassTask {
   id: string;
   title: string;
@@ -211,6 +227,8 @@ export const demoMemberships: DemoMembership[] = [
       "lesson.create",
       "assessment.view",
       "assessment.create",
+      "assessment.mark",
+      "gradebook.view",
       "ai.use",
     ],
   },
@@ -232,6 +250,8 @@ export const demoMemberships: DemoMembership[] = [
       "lesson.create",
       "assessment.view",
       "assessment.create",
+      "assessment.mark",
+      "gradebook.view",
       "ai.use",
     ],
   },
@@ -789,6 +809,100 @@ export const demoAssessments: DemoAssessment[] = [
   },
 ];
 
+export const demoGradebookScores: DemoGradebookScore[] = [
+  {
+    id: "score-p4-fractions-ada",
+    workspaceId: "school-truth",
+    assessmentId: "assessment-p4-fractions",
+    classId: "class-p4-math",
+    learnerId: "learner-ada",
+    score: 18,
+    maxScore: 20,
+    status: "scored",
+    feedback: "Secure visual model and explanation.",
+    markedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T13:10:00.000Z",
+  },
+  {
+    id: "score-p4-fractions-tomi",
+    workspaceId: "school-truth",
+    assessmentId: "assessment-p4-fractions",
+    classId: "class-p4-math",
+    learnerId: "learner-tomi",
+    score: 15,
+    maxScore: 20,
+    status: "scored",
+    feedback: "Good comparison work; revisit explanation sentence.",
+    markedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T13:12:00.000Z",
+  },
+  {
+    id: "score-p4-fractions-kene",
+    workspaceId: "school-truth",
+    assessmentId: "assessment-p4-fractions",
+    classId: "class-p4-math",
+    learnerId: "learner-kene",
+    score: null,
+    maxScore: 20,
+    status: "missing",
+    feedback: "Absent for quick check; needs catch-up.",
+    markedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T13:14:00.000Z",
+  },
+  {
+    id: "score-p3-comprehension-ife",
+    workspaceId: "school-truth",
+    assessmentId: "assessment-p3-comprehension",
+    classId: "class-p3-english",
+    learnerId: "learner-ife",
+    score: 11,
+    maxScore: 15,
+    status: "scored",
+    feedback: "Clear main idea; add stronger evidence.",
+    markedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T13:30:00.000Z",
+  },
+  {
+    id: "score-p3-comprehension-zara",
+    workspaceId: "school-truth",
+    assessmentId: "assessment-p3-comprehension",
+    classId: "class-p3-english",
+    learnerId: "learner-zara",
+    score: null,
+    maxScore: 15,
+    status: "missing",
+    feedback: "Script pending.",
+    markedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T13:32:00.000Z",
+  },
+  {
+    id: "score-p5-matter-uche",
+    workspaceId: "school-truth",
+    assessmentId: "assessment-p5-matter",
+    classId: "class-p5-science",
+    learnerId: "learner-uche",
+    score: 22,
+    maxScore: 25,
+    status: "scored",
+    feedback: "Strong observation record and safe practical habits.",
+    markedByMembershipId: "mem-truth-admin",
+    updatedAt: "2026-07-15T16:00:00.000Z",
+  },
+  {
+    id: "score-river-community-maryam",
+    workspaceId: "school-river",
+    assessmentId: "assessment-river-community",
+    classId: "class-river-history",
+    learnerId: "learner-maryam",
+    score: 8,
+    maxScore: 10,
+    status: "scored",
+    feedback: "Tenant isolation fixture.",
+    markedByMembershipId: "mem-river-teacher",
+    updatedAt: "2026-07-16T11:00:00.000Z",
+  },
+];
+
 export function findDemoUserBySession(token: string | undefined) {
   const session = demoSessions.find((item) => item.token === token);
   return session ? demoUsers.find((user) => user.id === session.userId) ?? null : null;
@@ -845,6 +959,10 @@ export function getAttendanceRecordsForClass(classId: string, date: string) {
   );
 }
 
+export function getGradebookScoresForAssessment(assessmentId: string) {
+  return demoGradebookScores.filter((record) => record.assessmentId === assessmentId);
+}
+
 export function upsertDemoAttendanceRecords(
   records: Array<{
     workspaceId: string;
@@ -876,6 +994,46 @@ export function upsertDemoAttendanceRecords(
 
     demoAttendanceRecords.push({
       id: `attendance-${record.classId}-${record.learnerId}-${record.date}`,
+      ...record,
+      updatedAt,
+    });
+  }
+}
+
+export function upsertDemoGradebookScores(
+  records: Array<{
+    workspaceId: string;
+    assessmentId: string;
+    classId: string;
+    learnerId: string;
+    score: number | null;
+    maxScore: number;
+    status: DemoGradebookScoreStatus;
+    feedback: string;
+    markedByMembershipId: string;
+  }>,
+) {
+  const updatedAt = new Date().toISOString();
+
+  for (const record of records) {
+    const existing = demoGradebookScores.find(
+      (candidate) =>
+        candidate.assessmentId === record.assessmentId &&
+        candidate.learnerId === record.learnerId,
+    );
+
+    if (existing) {
+      existing.score = record.score;
+      existing.maxScore = record.maxScore;
+      existing.status = record.status;
+      existing.feedback = record.feedback;
+      existing.markedByMembershipId = record.markedByMembershipId;
+      existing.updatedAt = updatedAt;
+      continue;
+    }
+
+    demoGradebookScores.push({
+      id: `score-${record.assessmentId}-${record.learnerId}`,
       ...record,
       updatedAt,
     });

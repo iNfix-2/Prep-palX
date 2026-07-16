@@ -82,6 +82,8 @@ UI routes:
 - `/assessments` via `src/app/(teacher)/assessments/page.tsx`
 - `/assessments/new` via `src/app/(teacher)/assessments/new/page.tsx`
 - `/assessments/[assessmentId]` via `src/app/(teacher)/assessments/[assessmentId]/page.tsx`
+- `/gradebook` via `src/app/(teacher)/gradebook/page.tsx`
+- `/gradebook/[assessmentId]` via `src/app/(teacher)/gradebook/[assessmentId]/page.tsx`
 - `/ask-pal` via `src/app/ask-pal/page.tsx`
 - `/:section` via `src/app/(teacher)/[section]/page.tsx`
 - `/:section/new` via `src/app/(teacher)/[section]/new/page.tsx`
@@ -111,6 +113,8 @@ First-slice API routes:
 - `/api/v1/teacher/assessments`
 - `/api/v1/assessments`
 - `/api/v1/assessments/[assessmentId]`
+- `/api/v1/teacher/gradebooks`
+- `/api/v1/gradebooks/[assessmentId]`
 
 ## 6. Existing Page and Screen Structure
 
@@ -124,12 +128,13 @@ The current repo contains a scaffolded subset of the larger Stitch design:
 - Attendance and Attendance Register demo slice.
 - Lesson Planner, New Lesson Plan, and Lesson Plan Detail demo slice.
 - Assessments, New Assessment, and Assessment Detail demo slice.
+- Gradebook and Gradebook Sheet demo slice.
 
 The broader 88-screen Stitch design is not present as discrete source files in this repository. The implemented app uses consolidated renderers and typed mock configuration instead of one component per Stitch screen.
 
 ## 7. Existing API Calls
 
-No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class, attendance, lesson-planner, and assessment slices use server components/actions calling `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, and `src/lib/server/assessments-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
+No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class, attendance, lesson-planner, assessment, and gradebook slices use server components/actions calling `src/lib/server/classes-service.ts`, `src/lib/server/attendance-service.ts`, `src/lib/server/lesson-plans-service.ts`, `src/lib/server/assessments-service.ts`, and `src/lib/server/gradebook-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
 
 ## 8. Existing Mock Services and Mock Data
 
@@ -164,10 +169,11 @@ First-slice permission enforcement exists:
 - `src/lib/security/permissions.ts`
 - `src/lib/server/classes-service.ts`
 
-Implemented permissions include `class.view_assigned`, `class.manage`, `lesson.create`, `assessment.view`, `assessment.create`, and `ai.use`.
+Implemented permissions include `class.view_assigned`, `class.manage`, `lesson.create`, `assessment.view`, `assessment.create`, `assessment.mark`, `gradebook.view`, and `ai.use`.
 Attendance adds `attendance.record` and `attendance.view_reports`.
 Lesson planning adds `lesson.view` and uses `lesson.create`.
 Assessment creation and detail use `assessment.view` and `assessment.create`.
+Gradebook uses `gradebook.view` and `assessment.mark`.
 
 ## 11. Existing State Management
 
@@ -183,7 +189,7 @@ No database models, migrations, seed files, or schema tooling are present.
 
 ## 14. Existing Tests
 
-`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, attendance register filtering and save, lesson plan filtering and create, assessment filtering and create, admin access, `403` for same-tenant unassigned access, and `404` for cross-tenant access.
+`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, attendance register filtering and save, lesson plan filtering and create, assessment filtering and create, gradebook filtering and score save, admin access, `403` for same-tenant unassigned access, and `404` for cross-tenant access.
 
 ## 15. Existing Deployment Configuration
 

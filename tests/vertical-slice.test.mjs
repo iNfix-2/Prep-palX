@@ -415,6 +415,114 @@ test("admin membership can view all assessments in the active workspace", async 
   assert.equal(scienceAssessment.body.data.title, "Matter and Change Practical Evidence");
 });
 
+test("gradebook slice records scores with the same tenant and assignment rules", async () => {
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/gradebooks`);
+  assert.equal(unauthenticated.status, 401);
+
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+  const gradebooks = await getJson("/api/v1/teacher/gradebooks", teacherCookie);
+  const gradebookIds = gradebooks.gradebooks.map((gradebook) => gradebook.assessmentId);
+
+  assert.ok(gradebookIds.includes("assessment-p4-fractions"));
+  assert.ok(gradebookIds.includes("assessment-p3-comprehension"));
+  assert.ok(!gradebookIds.includes("assessment-p5-matter"));
+
+  const assignedSheet = await fetchJson(
+    "/api/v1/gradebooks/assessment-p4-fractions",
+    teacherCookie,
+  );
+  assert.equal(assignedSheet.response.status, 200);
+  assert.equal(assignedSheet.body.data.assessmentTitle, "Fractions Quick Check");
+  assert.equal(assignedSheet.body.data.learners.length, 3);
+
+  const unassignedSheet = await fetchJson(
+    "/api/v1/gradebooks/assessment-p5-matter",
+    teacherCookie,
+  );
+  assert.equal(unassignedSheet.response.status, 403);
+
+  const crossTenantSheet = await fetchJson(
+    "/api/v1/gradebooks/assessment-river-community",
+    teacherCookie,
+  );
+  assert.equal(crossTenantSheet.response.status, 404);
+
+  const invalidScore = await postJson(
+    "/api/v1/gradebooks/assessment-p4-fractions",
+    teacherCookie,
+    {
+      scores: [{ learnerId: "learner-ada", status: "scored", score: 30 }],
+    },
+  );
+  assert.equal(invalidScore.response.status, 400);
+
+  const invalidLearner = await postJson(
+    "/api/v1/gradebooks/assessment-p4-fractions",
+    teacherCookie,
+    {
+      scores: [{ learnerId: "learner-uche", status: "scored", score: 12 }],
+    },
+  );
+  assert.equal(invalidLearner.response.status, 400);
+
+  const unassignedSave = await postJson(
+    "/api/v1/gradebooks/assessment-p5-matter",
+    teacherCookie,
+    {
+      scores: [{ learnerId: "learner-uche", status: "scored", score: 20 }],
+    },
+  );
+  assert.equal(unassignedSave.response.status, 403);
+
+  const saved = await postJson(
+    "/api/v1/gradebooks/assessment-p3-comprehension",
+    teacherCookie,
+    {
+      scores: [
+        {
+          learnerId: "learner-zara",
+          status: "scored",
+          score: 10,
+          feedback: "Main idea is clearer with sentence support.",
+        },
+      ],
+    },
+  );
+  assert.equal(saved.response.status, 200);
+  assert.equal(saved.body.data.missingCount, 0);
+  assert.equal(
+    saved.body.data.learners.find((learner) => learner.learnerId === "learner-zara").score,
+    10,
+  );
+
+  const gradebookPage = await fetch(`${baseUrl}/gradebook`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(gradebookPage.status, 200);
+  assert.match(await gradebookPage.text(), /Fractions Quick Check/);
+
+  const sheetPage = await fetch(`${baseUrl}/gradebook/assessment-p4-fractions`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(sheetPage.status, 200);
+  assert.match(await sheetPage.text(), /Save scores/);
+});
+
+test("admin membership can view all gradebook sheets in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const gradebooks = await getJson("/api/v1/teacher/gradebooks", adminCookie);
+  const gradebookIds = gradebooks.gradebooks.map((gradebook) => gradebook.assessmentId);
+
+  assert.ok(gradebookIds.includes("assessment-p5-matter"));
+
+  const scienceSheet = await fetchJson(
+    "/api/v1/gradebooks/assessment-p5-matter",
+    adminCookie,
+  );
+  assert.equal(scienceSheet.response.status, 200);
+  assert.equal(scienceSheet.body.data.assessmentTitle, "Matter and Change Practical Evidence");
+});
+
 async function login(email, password) {
   const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: "POST",

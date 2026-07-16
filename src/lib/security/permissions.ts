@@ -9,6 +9,8 @@ export const permissions = [
   "lesson.create",
   "assessment.view",
   "assessment.create",
+  "assessment.mark",
+  "gradebook.view",
   "ai.use",
 ] as const;
 

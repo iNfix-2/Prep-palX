@@ -5,8 +5,8 @@ This matrix is the initial permission model. It must be enforced server-side bef
 | Role | Core Permissions | Screens | API Operations | Sensitive Fields | Tenant Boundary |
 | --- | --- | --- | --- | --- | --- |
 | Platform administrator | platform-wide support/admin permissions | Support admin, audit tools | platform support endpoints | cross-tenant metadata | Must be explicitly scoped and audited |
-| School administrator | `school.settings.manage`, `staff.manage`, `class.manage`, `attendance.record`, `attendance.view_reports`, `lesson.view`, `lesson.create`, `assessment.view`, `assessment.create`, `timetable.manage`, `report.review`, `audit.view` | Admin/settings/staff/classes/reports | school management APIs | staff/learner PII, attendance, lesson notes, assessment content, audit logs | Own school only |
-| Teacher | `class.view_assigned`, `lesson.view`, `lesson.create`, `attendance.record`, `attendance.view_reports`, `assessment.view`, `assessment.create`, `assessment.mark`, `report.prepare`, `ai.use` | Teacher dashboard, classes, lesson planner, attendance, assessments, gradebook, reports, Ask Pal | teacher class APIs, lesson plan APIs, attendance APIs, assessment APIs | learner scores, attendance, lesson notes, assessment content, comments | Assigned classes unless broader permission |
+| School administrator | `school.settings.manage`, `staff.manage`, `class.manage`, `attendance.record`, `attendance.view_reports`, `lesson.view`, `lesson.create`, `assessment.view`, `assessment.create`, `assessment.mark`, `gradebook.view`, `timetable.manage`, `report.review`, `audit.view` | Admin/settings/staff/classes/reports | school management APIs | staff/learner PII, attendance, lesson notes, assessment content, scores, audit logs | Own school only |
+| Teacher | `class.view_assigned`, `lesson.view`, `lesson.create`, `attendance.record`, `attendance.view_reports`, `assessment.view`, `assessment.create`, `assessment.mark`, `gradebook.view`, `report.prepare`, `ai.use` | Teacher dashboard, classes, lesson planner, attendance, assessments, gradebook, reports, Ask Pal | teacher class APIs, lesson plan APIs, attendance APIs, assessment APIs, gradebook APIs | learner scores, attendance, lesson notes, assessment content, comments | Assigned classes unless broader permission |
 | Reviewer | `assessment.moderate`, `assessment.approve`, `report.review`, `ai.approve_action` | Approvals, assessments, reports | approval/review APIs | assessment content, report comments | Assigned school/review scope |
 | Support administrator | `support.manage` | Help/support admin | support ticket APIs | ticket metadata | Assigned support scope |
 | Parent/guardian | `learner.view_guardian_scope` proposed | Guardian portal future | guardian learner APIs | own learner records only | Linked learner only |
@@ -28,6 +28,7 @@ This matrix is the initial permission model. It must be enforced server-side bef
 | `/assessments/[assessmentId]` | `assessment.view` or `assessment.create` scoped to assigned class or `class.manage` |
 | `/question-bank` | `question.view` |
 | `/gradebook` | `assessment.mark` or `gradebook.view` |
+| `/gradebook/[assessmentId]` | `assessment.mark` or `gradebook.view` scoped to assigned class or `class.manage` |
 | `/attendance` | `attendance.record` or `attendance.view_reports` |
 | `/attendance/[classId]` | `attendance.record` scoped to assigned class or `class.manage` |
 | `/reports` | `report.prepare` |
