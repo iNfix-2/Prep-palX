@@ -46,6 +46,20 @@ export interface DemoLearner {
   attendancePercent: number;
 }
 
+export type DemoAttendanceStatus = "present" | "absent" | "late" | "excused";
+
+export interface DemoAttendanceRecord {
+  id: string;
+  workspaceId: string;
+  classId: string;
+  learnerId: string;
+  date: string;
+  status: DemoAttendanceStatus;
+  note?: string;
+  markedByMembershipId: string;
+  updatedAt: string;
+}
+
 export interface DemoClassTask {
   id: string;
   title: string;
@@ -138,6 +152,8 @@ export const demoMemberships: DemoMembership[] = [
       "dashboard.view",
       "workspace.select",
       "class.view_assigned",
+      "attendance.record",
+      "attendance.view_reports",
       "lesson.create",
       "assessment.create",
       "ai.use",
@@ -155,6 +171,8 @@ export const demoMemberships: DemoMembership[] = [
       "workspace.select",
       "class.view_assigned",
       "class.manage",
+      "attendance.record",
+      "attendance.view_reports",
       "lesson.create",
       "assessment.create",
       "ai.use",
@@ -171,6 +189,7 @@ export const demoMemberships: DemoMembership[] = [
       "dashboard.view",
       "workspace.select",
       "class.view_assigned",
+      "attendance.record",
       "lesson.create",
     ],
   },
@@ -391,6 +410,73 @@ export const demoClasses: DemoClass[] = [
   },
 ];
 
+export const DEMO_TODAY = "2026-07-16";
+
+export const demoAttendanceRecords: DemoAttendanceRecord[] = [
+  {
+    id: "attendance-p4-ada-today",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    learnerId: "learner-ada",
+    date: DEMO_TODAY,
+    status: "present",
+    markedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T08:45:00.000Z",
+  },
+  {
+    id: "attendance-p4-tomi-today",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    learnerId: "learner-tomi",
+    date: DEMO_TODAY,
+    status: "late",
+    note: "Arrived after staff briefing.",
+    markedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T08:46:00.000Z",
+  },
+  {
+    id: "attendance-p4-kene-today",
+    workspaceId: "school-truth",
+    classId: "class-p4-math",
+    learnerId: "learner-kene",
+    date: DEMO_TODAY,
+    status: "absent",
+    note: "Guardian follow-up needed.",
+    markedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T08:47:00.000Z",
+  },
+  {
+    id: "attendance-p3-ife-today",
+    workspaceId: "school-truth",
+    classId: "class-p3-english",
+    learnerId: "learner-ife",
+    date: DEMO_TODAY,
+    status: "present",
+    markedByMembershipId: "mem-truth-teacher-ade",
+    updatedAt: "2026-07-16T09:20:00.000Z",
+  },
+  {
+    id: "attendance-p5-uche-today",
+    workspaceId: "school-truth",
+    classId: "class-p5-science",
+    learnerId: "learner-uche",
+    date: DEMO_TODAY,
+    status: "present",
+    markedByMembershipId: "mem-truth-admin",
+    updatedAt: "2026-07-16T09:10:00.000Z",
+  },
+  {
+    id: "attendance-river-maryam-today",
+    workspaceId: "school-river",
+    classId: "class-river-history",
+    learnerId: "learner-maryam",
+    date: DEMO_TODAY,
+    status: "present",
+    markedByMembershipId: "mem-river-teacher",
+    updatedAt: "2026-07-16T09:00:00.000Z",
+  },
+];
+
 export function findDemoUserBySession(token: string | undefined) {
   const session = demoSessions.find((item) => item.token === token);
   return session ? demoUsers.find((user) => user.id === session.userId) ?? null : null;
@@ -439,4 +525,47 @@ export function toPublicUser(user: DemoUser) {
     displayName: user.displayName,
     shortName: user.shortName,
   };
+}
+
+export function getAttendanceRecordsForClass(classId: string, date: string) {
+  return demoAttendanceRecords.filter(
+    (record) => record.classId === classId && record.date === date,
+  );
+}
+
+export function upsertDemoAttendanceRecords(
+  records: Array<{
+    workspaceId: string;
+    classId: string;
+    learnerId: string;
+    date: string;
+    status: DemoAttendanceStatus;
+    note?: string;
+    markedByMembershipId: string;
+  }>,
+) {
+  const updatedAt = new Date().toISOString();
+
+  for (const record of records) {
+    const existing = demoAttendanceRecords.find(
+      (candidate) =>
+        candidate.classId === record.classId &&
+        candidate.learnerId === record.learnerId &&
+        candidate.date === record.date,
+    );
+
+    if (existing) {
+      existing.status = record.status;
+      existing.note = record.note;
+      existing.markedByMembershipId = record.markedByMembershipId;
+      existing.updatedAt = updatedAt;
+      continue;
+    }
+
+    demoAttendanceRecords.push({
+      id: `attendance-${record.classId}-${record.learnerId}-${record.date}`,
+      ...record,
+      updatedAt,
+    });
+  }
 }

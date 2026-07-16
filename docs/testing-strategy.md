@@ -31,6 +31,12 @@ Implemented coverage:
 - Same-tenant unassigned class access returns `403`.
 - Cross-tenant class access returns `404`.
 - Admin membership can view all classes in the active tenant.
+- Unauthenticated `/api/v1/teacher/attendance` returns `401`.
+- Teacher attendance registers are filtered to assigned classes.
+- Attendance register save updates learner statuses and notes.
+- Invalid attendance learner IDs return `400`.
+- Attendance follows the same same-tenant `403` and cross-tenant `404` rules.
+- Admin membership can view attendance for all classes in the active tenant.
 
 Cover:
 
@@ -59,10 +65,11 @@ Initial critical path is partially covered by the integration test:
 2. Workspace selection.
 3. My Classes.
 4. Class Overview.
+5. Attendance.
+6. Attendance Register.
 
 Future paths:
 
-- Daily attendance.
 - Grade entry.
 - Report review and publication.
 

@@ -8,14 +8,14 @@ Confirmed source routes in this repository:
 
 | Category | Count | Notes |
 | --- | ---: | --- |
-| UI routes implemented | 20 | Includes dynamic section routes, Ask Pal, login, My Classes, and Class Overview. |
+| UI routes implemented | 22 | Includes dynamic section routes, Ask Pal, login, My Classes, Class Overview, Attendance, and Attendance Register. |
 | Mock API routes | 5 | JSON route handlers under `src/app/api`. |
-| First-slice integrated | 2 | `/classes` and `/classes/[classId]` use auth, tenant, permission, service, DTO, and adapter layers backed by in-memory seed data. |
-| Partially integrated | 10 | Prototype API handlers plus `/api/v1` demo-backed handlers. |
-| Mock-only | 16 | Remaining teacher workspace screens depend on mock data/config. |
+| Integrated demo slices | 4 | `/classes`, `/classes/[classId]`, `/attendance`, and `/attendance/[classId]` use auth, tenant, permission, service, DTO, and adapter layers backed by in-memory seed data. |
+| Partially integrated | 12 | Prototype API handlers plus `/api/v1` demo-backed handlers. |
+| Mock-only | 15 | Remaining teacher workspace screens depend on mock data/config. |
 | Duplicate or experimental in repo | 0 | Duplicate dashboard variants exist in Stitch reference, not repo source. |
-| Blocked by missing requirements | 16 | Validation, persistence, production auth, and domain-specific services. |
-| Blocked by missing backend capabilities | 20 | Database, migrations, durable sessions, audit, and production authorization storage. |
+| Blocked by missing requirements | 15 | Validation, persistence, production auth, and domain-specific services. |
+| Blocked by missing backend capabilities | 22 | Database, migrations, durable sessions, audit, and production authorization storage. |
 
 ## Canonicalization Notes
 
@@ -39,7 +39,8 @@ Confirmed source routes in this repository:
 | Timetable | `/timetable` | Scheduling | Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | daily schedule and health | Today, optimize week | No | `timetable.view` | Calendar | Canonical placeholder | all async states | Low |
 | Academic Calendar | `/academic-calendar` | Scheduling | Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | events, milestones | add event placeholder, plan with Pal | No | `calendar.view` | Timetable | Canonical placeholder | all async states | Low |
 | Gradebook | `/gradebook` | Gradebook/results | Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | result sheets, learner flags | enter scores placeholder, analyze gaps | No | `gradebook.view` / `assessment.mark` | Reports | Canonical placeholder | all async states | Low |
-| Attendance | `/attendance` | Attendance | Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | registers and follow-ups | mark today placeholder | No | `attendance.record` | Classes | Canonical placeholder | all async states | Low |
+| Attendance | `/attendance` | Attendance | Teacher/Admin | Integrated demo UI | Responsive custom cards | `src/lib/server/demo-store.ts` | Server service; `/api/v1/teacher/attendance` available | register status, counts, assigned classes, absence signals | open register, attendance report | No | `attendance.record` or `attendance.view_reports` | Classes, Reports | Canonical attendance list | Implemented | High for demo, medium for production |
+| Attendance Register | `/attendance/[classId]` | Attendance | Teacher/Admin | Integrated demo UI | Responsive register form | `src/lib/server/demo-store.ts` | Server action; `/api/v1/classes/{classId}/attendance` available | learner roster, attendance statuses, notes, register counts | save register, cancel | Yes, server action form | assigned class with `attendance.record` or `class.manage` | Attendance, Classes | Canonical attendance register | Implemented | High for demo, medium for production |
 | Resources | `/resources` | Teaching resources | Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | library resources and hygiene | upload placeholder, generate worksheet | No | `resource.view` / `resource.manage` | Lesson Planner | Canonical placeholder | all async states | Low |
 | Approvals | `/approvals` | Workflow approvals | Reviewer/Teacher | Generic workspace screen | Responsive | `workspace-data.ts` | No | approval queue and reviewer activity | review queue, delegate placeholder | No | `approval.review` | Assessments, Reports | Canonical placeholder | all async states | Low |
 | Reports | `/reports` | Reporting | Teacher/Reviewer | Generic workspace screen | Responsive | `workspace-data.ts` | No | readiness, profiles, publishing checklist | generate report placeholder | No | `report.prepare` | Gradebook | Canonical placeholder | all async states | Low |
@@ -64,6 +65,8 @@ Confirmed source routes in this repository:
 | `/api/v1/workspaces/select` | `src/app/api/v1/workspaces/select/route.ts` | Demo integrated | Verifies membership before setting active workspace. |
 | `/api/v1/teacher/classes` | `src/app/api/v1/teacher/classes/route.ts` | Demo integrated | Tenant-scoped class list with permission filtering. |
 | `/api/v1/classes/[classId]` | `src/app/api/v1/classes/[classId]/route.ts` | Demo integrated | Class overview with assigned-class, admin, and tenant checks. |
+| `/api/v1/teacher/attendance` | `src/app/api/v1/teacher/attendance/route.ts` | Demo integrated | Tenant-scoped attendance register list with permission filtering. |
+| `/api/v1/classes/[classId]/attendance` | `src/app/api/v1/classes/[classId]/attendance/route.ts` | Demo integrated | Class attendance register read/save with assigned-class, admin, and tenant checks. |
 
 ## Deprecated-Screen Candidates
 

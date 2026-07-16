@@ -93,6 +93,79 @@ components:
                 type: string
               displayName:
                 type: string
+    AttendanceStatus:
+      type: string
+      enum: [present, absent, late, excused]
+    AttendanceClassSummary:
+      type: object
+      required: [id, displayName, learnerCount, markedCount, status, counts]
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        learnerCount:
+          type: integer
+        markedCount:
+          type: integer
+        status:
+          type: string
+          enum: [complete, partial, pending]
+        counts:
+          type: object
+          required: [present, absent, late, excused, pending]
+          properties:
+            present:
+              type: integer
+            absent:
+              type: integer
+            late:
+              type: integer
+            excused:
+              type: integer
+            pending:
+              type: integer
+    AttendanceRegister:
+      allOf:
+        - $ref: "#/components/schemas/AttendanceClassSummary"
+        - type: object
+          required: [learners]
+          properties:
+            learners:
+              type: array
+              items:
+                type: object
+                required: [learnerId, displayName, status, isMarked]
+                properties:
+                  learnerId:
+                    type: string
+                  displayName:
+                    type: string
+                  status:
+                    $ref: "#/components/schemas/AttendanceStatus"
+                  note:
+                    type: string
+                  isMarked:
+                    type: boolean
+    MarkAttendanceRequest:
+      type: object
+      required: [records]
+      properties:
+        date:
+          type: string
+          format: date
+        records:
+          type: array
+          items:
+            type: object
+            required: [learnerId, status]
+            properties:
+              learnerId:
+                type: string
+              status:
+                $ref: "#/components/schemas/AttendanceStatus"
+              note:
+                type: string
 paths:
   /auth/login:
     post:
@@ -164,6 +237,16 @@ paths:
           description: Unauthenticated.
         "403":
           description: Missing class permission.
+  /teacher/attendance:
+    get:
+      summary: List attendance registers for accessible classes.
+      responses:
+        "200":
+          description: Attendance register summaries.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Missing attendance permission.
   /classes/{classId}:
     get:
       summary: Get class overview if the user has access.
@@ -180,5 +263,48 @@ paths:
           description: Unauthenticated.
         "403":
           description: Class is outside permitted scope.
+        "404":
+          description: Class not found in active tenant.
+  /classes/{classId}/attendance:
+    get:
+      summary: Get attendance register for an accessible class.
+      parameters:
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Attendance register.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Class is outside permitted scope or missing attendance permission.
+        "404":
+          description: Class not found in active tenant.
+    post:
+      summary: Save attendance records for an accessible class.
+      parameters:
+        - in: path
+          name: classId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MarkAttendanceRequest"
+      responses:
+        "200":
+          description: Updated attendance register.
+        "400":
+          description: Invalid attendance records.
+        "401":
+          description: Unauthenticated.
+        "403":
+          description: Class is outside permitted scope or missing attendance permission.
         "404":
           description: Class not found in active tenant.

@@ -74,6 +74,8 @@ UI routes:
 - `/login` via `src/app/login/page.tsx`
 - `/classes` via `src/app/(teacher)/classes/page.tsx`
 - `/classes/[classId]` via `src/app/(teacher)/classes/[classId]/page.tsx`
+- `/attendance` via `src/app/(teacher)/attendance/page.tsx`
+- `/attendance/[classId]` via `src/app/(teacher)/attendance/[classId]/page.tsx`
 - `/ask-pal` via `src/app/ask-pal/page.tsx`
 - `/:section` via `src/app/(teacher)/[section]/page.tsx`
 - `/:section/new` via `src/app/(teacher)/[section]/new/page.tsx`
@@ -95,6 +97,8 @@ First-slice API routes:
 - `/api/v1/workspaces/select`
 - `/api/v1/teacher/classes`
 - `/api/v1/classes/[classId]`
+- `/api/v1/teacher/attendance`
+- `/api/v1/classes/[classId]/attendance`
 
 ## 6. Existing Page and Screen Structure
 
@@ -105,12 +109,13 @@ The current repo contains a scaffolded subset of the larger Stitch design:
 - Dynamic teacher workspace renderer for sidebar modules.
 - Dynamic builder renderer for lesson and assessment draft flows.
 - First-slice My Classes and Class Overview screens.
+- Attendance and Attendance Register demo slice.
 
 The broader 88-screen Stitch design is not present as discrete source files in this repository. The implemented app uses consolidated renderers and typed mock configuration instead of one component per Stitch screen.
 
 ## 7. Existing API Calls
 
-No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The first class slice uses server components calling `src/lib/server/classes-service.ts`; `/api/v1` exposes the same demo-backed contract for clients and tests.
+No UI component currently performs client-side network calls with `fetch`, `axios`, or another API client. The class and attendance slices use server components/actions calling `src/lib/server/classes-service.ts` and `src/lib/server/attendance-service.ts`; `/api/v1` exposes the same demo-backed contracts for clients and tests.
 
 ## 8. Existing Mock Services and Mock Data
 
@@ -146,6 +151,7 @@ First-slice permission enforcement exists:
 - `src/lib/server/classes-service.ts`
 
 Implemented permissions include `class.view_assigned`, `class.manage`, `lesson.create`, `assessment.create`, and `ai.use`.
+Attendance adds `attendance.record` and `attendance.view_reports`.
 
 ## 11. Existing State Management
 
@@ -161,7 +167,7 @@ No database models, migrations, seed files, or schema tooling are present.
 
 ## 14. Existing Tests
 
-`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, admin class access, `403` for same-tenant unassigned class access, and `404` for cross-tenant access.
+`npm test` runs `tests/vertical-slice.test.mjs`, which boots Next dev and verifies demo login, active workspace, teacher class filtering, attendance register filtering and save, admin access, `403` for same-tenant unassigned class access, and `404` for cross-tenant access.
 
 ## 15. Existing Deployment Configuration
 

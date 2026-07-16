@@ -39,8 +39,8 @@ Features: Teacher Dashboard, My Classes, Class Overview, daily attendance, class
 
 Acceptance: teacher sees only assigned classes; class detail is tenant-scoped.
 
-Complexity: large. Status: first vertical slice implemented for My Classes and Class
-Overview with in-memory seed data. Attendance, classroom records, tasks persistence,
+Complexity: large. Status: demo slices implemented for My Classes, Class Overview,
+and daily Attendance with in-memory seed data. Classroom records, tasks persistence,
 and dashboard backend integration are not started.
 
 ## Phase D: Assessment and Gradebook
@@ -90,4 +90,5 @@ Complexity: extra-large. Status: not started.
 ## Next Backend Hardening Step
 
 Replace `src/lib/server/demo-store.ts` with a real database repository layer while
-preserving the service boundary in `src/lib/server/classes-service.ts`.
+preserving the service boundaries in `src/lib/server/classes-service.ts` and
+`src/lib/server/attendance-service.ts`.

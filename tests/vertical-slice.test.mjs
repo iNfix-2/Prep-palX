@@ -94,6 +94,92 @@ test("admin membership can view all classes in the active workspace", async () =
   assert.equal(scienceClass.body.data.id, "class-p5-science");
 });
 
+test("attendance slice records registers with the same tenant and assignment rules", async () => {
+  const teacherCookie = await login("mrs.adeyemi@truth.test", "password");
+
+  const unauthenticated = await fetch(`${baseUrl}/api/v1/teacher/attendance`);
+  assert.equal(unauthenticated.status, 401);
+
+  const attendance = await getJson("/api/v1/teacher/attendance", teacherCookie);
+  assert.deepEqual(
+    attendance.classes.map((classItem) => classItem.id),
+    ["class-p3-english", "class-p4-math"],
+  );
+
+  const register = await getJson(
+    "/api/v1/classes/class-p3-english/attendance",
+    teacherCookie,
+  );
+  assert.equal(register.status, "partial");
+  assert.equal(register.counts.pending, 1);
+
+  const updated = await postJson(
+    "/api/v1/classes/class-p3-english/attendance",
+    teacherCookie,
+    {
+      records: [
+        { learnerId: "learner-ife", status: "present" },
+        {
+          learnerId: "learner-zara",
+          status: "absent",
+          note: "Guardian follow-up needed",
+        },
+      ],
+    },
+  );
+  assert.equal(updated.response.status, 200);
+  assert.equal(updated.body.data.status, "complete");
+  assert.equal(updated.body.data.counts.absent, 1);
+  assert.equal(
+    updated.body.data.learners.find((learner) => learner.learnerId === "learner-zara").note,
+    "Guardian follow-up needed",
+  );
+
+  const invalidLearner = await postJson(
+    "/api/v1/classes/class-p3-english/attendance",
+    teacherCookie,
+    {
+      records: [{ learnerId: "learner-uche", status: "present" }],
+    },
+  );
+  assert.equal(invalidLearner.response.status, 400);
+
+  const unassignedClass = await fetchJson(
+    "/api/v1/classes/class-p5-science/attendance",
+    teacherCookie,
+  );
+  assert.equal(unassignedClass.response.status, 403);
+
+  const crossTenantClass = await fetchJson(
+    "/api/v1/classes/class-river-history/attendance",
+    teacherCookie,
+  );
+  assert.equal(crossTenantClass.response.status, 404);
+
+  const attendancePage = await fetch(`${baseUrl}/attendance`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(attendancePage.status, 200);
+  assert.match(await attendancePage.text(), /Primary 3 English/);
+
+  const registerPage = await fetch(`${baseUrl}/attendance/class-p3-english`, {
+    headers: { cookie: teacherCookie },
+  });
+  assert.equal(registerPage.status, 200);
+  assert.match(await registerPage.text(), /Save register/);
+});
+
+test("admin membership can record attendance for all classes in the active workspace", async () => {
+  const adminCookie = await login("admin@truth.test", "password");
+  const scienceRegister = await getJson(
+    "/api/v1/classes/class-p5-science/attendance",
+    adminCookie,
+  );
+
+  assert.equal(scienceRegister.id, "class-p5-science");
+  assert.equal(scienceRegister.status, "complete");
+});
+
 async function login(email, password) {
   const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
     method: "POST",
@@ -114,6 +200,19 @@ async function getJson(path, cookie) {
 async function fetchJson(path, cookie) {
   const response = await fetch(`${baseUrl}${path}`, {
     headers: { cookie },
+  });
+  const body = await response.json();
+  return { response, body };
+}
+
+async function postJson(path, cookie, payload) {
+  const response = await fetch(`${baseUrl}${path}`, {
+    method: "POST",
+    headers: {
+      cookie,
+      "content-type": "application/json",
+    },
+    body: JSON.stringify(payload),
   });
   const body = await response.json();
   return { response, body };
