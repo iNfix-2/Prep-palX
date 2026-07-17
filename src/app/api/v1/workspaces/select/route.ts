@@ -5,7 +5,8 @@ import {
   demoCookieOptions,
   getRequestAuthContext,
 } from "@/lib/server/auth-context";
-import { getMembership, getWorkspace } from "@/lib/server/demo-store";
+import { getRepositories } from "@/lib/server/repositories";
+import { selectAccountWorkspace } from "@/lib/server/settings-service";
 
 export async function POST(request: NextRequest) {
   const context = getRequestAuthContext(request);
@@ -23,23 +24,26 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const membership = getMembership(context.user.id, workspaceId);
-  const workspace = getWorkspace(workspaceId);
+  const result = selectAccountWorkspace(context, workspaceId);
 
-  if (!membership || !workspace) {
-    return apiError("FORBIDDEN", "You are not a member of this workspace.", 403);
+  if (!result.ok) {
+    return apiError(result.code, result.message, result.status, result.fields);
   }
+
+  const { access } = getRepositories();
+  const workspace = access.getWorkspace(result.data.workspaceId);
+  const membership = access.getMembership(context.user.id, result.data.workspaceId);
 
   const response = NextResponse.json({
     data: {
       activeWorkspace: {
-        id: workspace.id,
-        name: workspace.name,
-        role: membership.roleName,
+        id: result.data.workspaceId,
+        name: workspace?.name ?? result.data.workspaceId,
+        role: membership?.roleName ?? "Member",
       },
     },
   });
 
-  response.cookies.set(ACTIVE_WORKSPACE_COOKIE_NAME, workspace.id, demoCookieOptions);
+  response.cookies.set(ACTIVE_WORKSPACE_COOKIE_NAME, result.data.workspaceId, demoCookieOptions);
   return response;
 }

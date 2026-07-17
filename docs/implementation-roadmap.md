@@ -121,3 +121,9 @@ preserving the service boundaries in `src/lib/server/classes-service.ts` and
 `src/lib/server/question-bank-service.ts`, `src/lib/server/timetable-service.ts`,
 `src/lib/server/academic-calendar-service.ts`, `src/lib/server/resources-service.ts`,
 `src/lib/server/reports-service.ts`, and `src/lib/server/approvals-service.ts`.
+
+Started: `src/lib/server/repositories/` now defines demo-backed access and
+account settings repository contracts used by auth context, login/workspace APIs,
+settings, and Ask Pal. Remaining work is to add domain repositories for classes,
+tasks, attendance, planning, assessment, resources, reports, approvals, and AI
+audit, then swap the demo implementations for database-backed adapters.

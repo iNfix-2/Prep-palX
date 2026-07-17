@@ -9,6 +9,7 @@
 - Dynamic generic screens can hide domain-specific missing behavior.
 - Test coverage currently protects demo vertical slices, not production persistence or audit flows.
 - No validation library or forms strategy.
+- Repository boundaries exist for access/account settings only; most domain services still depend on demo fixtures directly.
 - No durable audit logging yet for sensitive school operations, account settings, support requests, assistant proposals, or approval decisions.
 - Ask Pal has demo permission/action boundaries, but no production AI provider, moderation, rate limiting, or durable action audit yet.
 - No database migration system.

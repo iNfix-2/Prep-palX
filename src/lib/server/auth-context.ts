@@ -1,15 +1,7 @@
 import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
-import {
-  findDemoUserBySession,
-  getDefaultWorkspaceForUser,
-  getMembership,
-  getWorkspace,
-  listMembershipsForUser,
-  toPublicUser,
-  type DemoMembership,
-  type DemoWorkspace,
-} from "@/lib/server/demo-store";
+import type { DemoMembership, DemoWorkspace } from "@/lib/server/demo-store";
+import { getRepositories, type PublicUser } from "@/lib/server/repositories";
 
 export const SESSION_COOKIE_NAME = "prep_pal_session";
 export const ACTIVE_WORKSPACE_COOKIE_NAME = "prep_pal_workspace";
@@ -21,8 +13,6 @@ export const demoCookieOptions = {
   path: "/",
   maxAge: 60 * 60 * 8,
 };
-
-export type PublicUser = ReturnType<typeof toPublicUser>;
 
 export type RequestAuthContext =
   | {
@@ -62,7 +52,8 @@ export function resolveAuthContext({
   sessionToken?: string;
   workspaceId?: string;
 }): RequestAuthContext {
-  const user = findDemoUserBySession(sessionToken);
+  const { access } = getRepositories();
+  const user = access.findUserBySession(sessionToken);
 
   if (!user) {
     return {
@@ -74,11 +65,11 @@ export function resolveAuthContext({
     };
   }
 
-  const memberships = listMembershipsForUser(user.id);
-  const requestedMembership = workspaceId ? getMembership(user.id, workspaceId) : null;
-  const fallbackWorkspace = getDefaultWorkspaceForUser(user.id);
+  const memberships = access.listMembershipsForUser(user.id);
+  const requestedMembership = workspaceId ? access.getMembership(user.id, workspaceId) : null;
+  const fallbackWorkspace = access.getDefaultWorkspaceForUser(user.id);
   const activeWorkspace =
-    (requestedMembership ? getWorkspace(requestedMembership.workspaceId) : null) ??
+    (requestedMembership ? access.getWorkspace(requestedMembership.workspaceId) : null) ??
     fallbackWorkspace;
 
   if (!activeWorkspace) {
@@ -91,7 +82,7 @@ export function resolveAuthContext({
     };
   }
 
-  const activeMembership = getMembership(user.id, activeWorkspace.id);
+  const activeMembership = access.getMembership(user.id, activeWorkspace.id);
 
   if (!activeMembership) {
     return {
@@ -105,7 +96,7 @@ export function resolveAuthContext({
 
   return {
     status: "authenticated",
-    user: toPublicUser(user),
+    user: access.toPublicUser(user),
     memberships,
     activeWorkspace,
     activeMembership,

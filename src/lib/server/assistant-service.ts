@@ -21,9 +21,9 @@ import { listTeacherClasses } from "@/lib/server/classes-service";
 import {
   createDemoAiProposal,
   DEMO_TODAY,
-  getDemoAccountSettings,
 } from "@/lib/server/demo-store";
 import { listTeacherGradebooks } from "@/lib/server/gradebook-service";
+import { getRepositories } from "@/lib/server/repositories";
 import { listTeacherResources } from "@/lib/server/resources-service";
 import { listTeacherTasks } from "@/lib/server/tasks-service";
 import { listTeacherTimetable } from "@/lib/server/timetable-service";
@@ -136,7 +136,9 @@ export function createAssistantProposal(
         provider: "demo-assistant",
         modelLabel: "Prep Pal demo assistant",
         createdAt: record.createdAt,
-        confirmationMode: getDemoAccountSettings(access.data.context.activeMembership.id)
+        confirmationMode: getRepositories().accountSettings.getForMembership(
+          access.data.context.activeMembership.id,
+        )
           .aiConfirmationMode,
         tenantScoped: true,
       },
@@ -150,7 +152,7 @@ function buildAssistantWorkspace(context: AuthenticatedContext): AssistantWorksp
   const timetable = getData(listTeacherTimetable(context, DEMO_TODAY))?.events ?? [];
   const resources = getData(listTeacherResources(context))?.resources ?? [];
   const gradebooks = getData(listTeacherGradebooks(context))?.gradebooks ?? [];
-  const settings = getDemoAccountSettings(context.activeMembership.id);
+  const settings = getRepositories().accountSettings.getForMembership(context.activeMembership.id);
   const primaryClass = classes.find((classItem) => classItem.id === "class-p4-math") ?? classes[0];
   const nextEvent = timetable.find((event) => event.status !== "completed");
   const openTasks = tasks.filter((task) => task.status !== "done");
@@ -519,7 +521,7 @@ function buildResponse(
 }
 
 function requiresConfirmation(membershipId: string, impact: AssistantActionImpact) {
-  const mode = getDemoAccountSettings(membershipId).aiConfirmationMode;
+  const mode = getRepositories().accountSettings.getForMembership(membershipId).aiConfirmationMode;
 
   if (mode === "always") {
     return true;

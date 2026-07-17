@@ -460,6 +460,25 @@ export interface DemoClass {
   recentActivity: string[];
 }
 
+interface DemoMutableStoreState {
+  demoSessions: DemoSession[];
+  demoAiProposals: DemoAiProposal[];
+  demoAccountSettings: DemoAccountSettings[];
+  demoTeacherTasks: DemoTeacherTask[];
+  demoSupportRequests: DemoSupportRequest[];
+  demoAttendanceRecords: DemoAttendanceRecord[];
+  demoLessonPlans: DemoLessonPlan[];
+  demoAssessments: DemoAssessment[];
+  demoQuestions: DemoQuestion[];
+  demoGradebookScores: DemoGradebookScore[];
+  demoReportComments: DemoReportComment[];
+  demoApprovalRequests: DemoApprovalRequest[];
+}
+
+const demoMutableStore = ((globalThis as typeof globalThis & {
+  __prepPalDemoStore?: Partial<DemoMutableStoreState>;
+}).__prepPalDemoStore ??= {});
+
 export const demoUsers: DemoUser[] = [
   {
     id: "user-ade",
@@ -607,15 +626,15 @@ export const demoMemberships: DemoMembership[] = [
   },
 ];
 
-export const demoSessions: DemoSession[] = [
+export const demoSessions: DemoSession[] = (demoMutableStore.demoSessions ??= [
   { token: "session-teacher-ade", userId: "user-ade" },
   { token: "session-admin-truth", userId: "user-admin-truth" },
   { token: "session-river-teacher", userId: "user-river" },
-];
+]);
 
-export const demoAiProposals: DemoAiProposal[] = [];
+export const demoAiProposals: DemoAiProposal[] = (demoMutableStore.demoAiProposals ??= []);
 
-export const demoAccountSettings: DemoAccountSettings[] = [
+export const demoAccountSettings: DemoAccountSettings[] = (demoMutableStore.demoAccountSettings ??= [
   {
     membershipId: "mem-truth-teacher-ade",
     emailNotifications: true,
@@ -673,7 +692,7 @@ export const demoAccountSettings: DemoAccountSettings[] = [
     passwordUpdatedAt: "2026-06-18T10:00:00.000Z",
     updatedAt: "2026-07-12T09:00:00.000Z",
   },
-];
+]);
 
 export const demoLearners: DemoLearner[] = [
   {
@@ -884,7 +903,7 @@ export const demoClasses: DemoClass[] = [
   },
 ];
 
-export const demoTeacherTasks: DemoTeacherTask[] = [
+export const demoTeacherTasks: DemoTeacherTask[] = (demoMutableStore.demoTeacherTasks ??= [
   {
     id: "task-p3-score-entry",
     workspaceId: "school-truth",
@@ -1073,7 +1092,7 @@ export const demoTeacherTasks: DemoTeacherTask[] = [
     sourceLabel: "Community Helpers Picture Cards",
     activities: [],
   },
-];
+]);
 
 export const demoSupportGuides: DemoSupportGuide[] = [
   {
@@ -1129,7 +1148,7 @@ export const demoSupportGuides: DemoSupportGuide[] = [
   },
 ];
 
-export const demoSupportRequests: DemoSupportRequest[] = [
+export const demoSupportRequests: DemoSupportRequest[] = (demoMutableStore.demoSupportRequests ??= [
   {
     id: "support-gradebook-import",
     workspaceId: "school-truth",
@@ -1231,11 +1250,11 @@ export const demoSupportRequests: DemoSupportRequest[] = [
       },
     ],
   },
-];
+]);
 
 export const DEMO_TODAY = "2026-07-16";
 
-export const demoAttendanceRecords: DemoAttendanceRecord[] = [
+export const demoAttendanceRecords: DemoAttendanceRecord[] = (demoMutableStore.demoAttendanceRecords ??= [
   {
     id: "attendance-p4-ada-today",
     workspaceId: "school-truth",
@@ -1298,9 +1317,9 @@ export const demoAttendanceRecords: DemoAttendanceRecord[] = [
     markedByMembershipId: "mem-river-teacher",
     updatedAt: "2026-07-16T09:00:00.000Z",
   },
-];
+]);
 
-export const demoLessonPlans: DemoLessonPlan[] = [
+export const demoLessonPlans: DemoLessonPlan[] = (demoMutableStore.demoLessonPlans ??= [
   {
     id: "lesson-p4-fractions",
     workspaceId: "school-truth",
@@ -1405,9 +1424,9 @@ export const demoLessonPlans: DemoLessonPlan[] = [
     createdByMembershipId: "mem-river-teacher",
     updatedAt: "2026-07-16T09:00:00.000Z",
   },
-];
+]);
 
-export const demoAssessments: DemoAssessment[] = [
+export const demoAssessments: DemoAssessment[] = (demoMutableStore.demoAssessments ??= [
   {
     id: "assessment-p4-fractions",
     workspaceId: "school-truth",
@@ -1552,9 +1571,9 @@ export const demoAssessments: DemoAssessment[] = [
     createdByMembershipId: "mem-river-teacher",
     updatedAt: "2026-07-16T10:30:00.000Z",
   },
-];
+]);
 
-export const demoQuestions: DemoQuestion[] = [
+export const demoQuestions: DemoQuestion[] = (demoMutableStore.demoQuestions ??= [
   {
     id: "question-p4-equivalent-fractions",
     workspaceId: "school-truth",
@@ -1635,7 +1654,7 @@ export const demoQuestions: DemoQuestion[] = [
     createdByMembershipId: "mem-river-teacher",
     updatedAt: "2026-07-16T10:40:00.000Z",
   },
-];
+]);
 
 export const demoTimetableEvents: DemoTimetableEvent[] = [
   {
@@ -1965,7 +1984,7 @@ export const demoResources: DemoResource[] = [
   },
 ];
 
-export const demoGradebookScores: DemoGradebookScore[] = [
+export const demoGradebookScores: DemoGradebookScore[] = (demoMutableStore.demoGradebookScores ??= [
   {
     id: "score-p4-fractions-ada",
     workspaceId: "school-truth",
@@ -2057,9 +2076,9 @@ export const demoGradebookScores: DemoGradebookScore[] = [
     markedByMembershipId: "mem-river-teacher",
     updatedAt: "2026-07-16T11:00:00.000Z",
   },
-];
+]);
 
-export const demoReportComments: DemoReportComment[] = [
+export const demoReportComments: DemoReportComment[] = (demoMutableStore.demoReportComments ??= [
   {
     id: "report-comment-p4-ada",
     workspaceId: "school-truth",
@@ -2124,9 +2143,9 @@ export const demoReportComments: DemoReportComment[] = [
     updatedByMembershipId: "mem-river-teacher",
     updatedAt: "2026-07-16T12:00:00.000Z",
   },
-];
+]);
 
-export const demoApprovalRequests: DemoApprovalRequest[] = [
+export const demoApprovalRequests: DemoApprovalRequest[] = (demoMutableStore.demoApprovalRequests ??= [
   {
     id: "approval-lesson-p3-reading",
     workspaceId: "school-truth",
@@ -2225,7 +2244,7 @@ export const demoApprovalRequests: DemoApprovalRequest[] = [
     updatedAt: "2026-07-16T10:45:00.000Z",
     notes: [],
   },
-];
+]);
 
 export function findDemoUserBySession(token: string | undefined) {
   const session = demoSessions.find((item) => item.token === token);

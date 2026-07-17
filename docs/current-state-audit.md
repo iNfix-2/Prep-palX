@@ -15,7 +15,7 @@ Confirmed paths:
 - `src/components/layout/`: teacher sidebar, mobile nav, and top bar.
 - `src/components/ui/`: small local UI primitives.
 - `src/components/workspace/`: reusable workspace and builder page renderers.
-- `src/lib/`: mock data, shared utilities, and server data service.
+- `src/lib/`: mock data, shared utilities, server services, and the demo-backed repository registry.
 - `docs/`: architecture and integration documentation.
 
 No `pages/` directory is present. No backend framework directory, database schema, migrations, or ORM configuration exists yet.
@@ -39,6 +39,7 @@ No `pages/` directory is present. No backend framework directory, database schem
 - Validation library: none.
 - Testing tools: Node built-in test runner through `npm test`.
 - Existing API client: `src/lib/api/client.ts` for standardized JSON responses.
+- Existing repository boundary: `src/lib/server/repositories/` provides demo-backed access and account settings repositories.
 - Environment strategy: `.env*` ignored by `.gitignore`; no documented env vars or `.env.example` exists yet.
 - Deployment configuration: none detected (`vercel.json`, Dockerfile, CI config absent).
 - CI/CD: none detected.
@@ -194,11 +195,17 @@ Mock data paths:
 - `src/lib/workspace-data.ts`
 - `src/lib/server/demo-store.ts`
 
-Mock service path:
+Mock service and repository paths:
 
 - `src/lib/server/data-service.ts`
+- `src/lib/server/repositories/`
 
-The mock service is thin and not tenant-aware yet.
+The legacy mock service is thin and not tenant-aware. The repository registry now
+covers access/session/workspace/membership resolution and account settings, but
+most domain services still read directly from `src/lib/server/demo-store.ts`.
+Mutable demo fixtures are process-global so dev route bundles share state during
+vertical-slice tests; they remain non-durable and reset when the server process
+restarts.
 
 ## 9. Existing Authentication Code
 
@@ -208,8 +215,10 @@ Demo authentication exists for the first vertical slice:
 - `src/app/api/v1/auth/login/route.ts`
 - `src/app/api/v1/auth/logout/route.ts`
 - `src/lib/server/auth-context.ts`
+- `src/lib/server/repositories/`
 
-It uses deterministic in-memory fixtures, not production password hashing or durable sessions.
+It uses deterministic in-memory fixtures behind demo repositories, not production
+password hashing or durable sessions.
 
 ## 10. Existing Role and Permission Logic
 
@@ -252,6 +261,7 @@ No deployment configuration files were found in the repo root.
 - Legacy generic prototype screens and unversioned prototype APIs are mock-data driven.
 - API responses are not standardized.
 - Auth, tenancy, and authorization foundation exists for integrated `/api/v1` demo slices and is demo-backed.
+- Access/session/workspace/account settings now use repository interfaces; domain repositories are still pending.
 - No form validation standard.
 - Loading/error/empty/unauthorized/forbidden states exist in `src/components/states/data-states.tsx`.
 - No database model or migration system.

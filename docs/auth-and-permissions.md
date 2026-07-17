@@ -8,6 +8,7 @@ First vertical-slice demo implementation exists:
 - `src/app/api/v1/auth/login/route.ts` sets HttpOnly demo session and active workspace cookies.
 - `src/app/api/v1/auth/logout/route.ts` clears those cookies.
 - `src/lib/server/auth-context.ts` resolves user, active workspace, membership, and permissions.
+- `src/lib/server/repositories/` provides demo-backed access and account settings repositories.
 - `src/lib/security/permissions.ts` defines the first permission set.
 - `src/lib/server/classes-service.ts` enforces tenant and class permissions.
 - `src/lib/server/settings-service.ts` enforces self-account and workspace selection permissions.

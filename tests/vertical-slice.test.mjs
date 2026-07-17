@@ -12,7 +12,7 @@ let serverOutput = "";
 test.before(async () => {
   server = spawn(
     process.execPath,
-    ["node_modules/next/dist/bin/next", "dev", "-p", String(port), "-H", host],
+    ["node_modules/next/dist/bin/next", "dev", "--webpack", "-p", String(port), "-H", host],
     {
       cwd: process.cwd(),
       env: {

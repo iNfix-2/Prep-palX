@@ -7,12 +7,8 @@ import type {
 } from "@/lib/features/settings/types";
 import { hasPermission } from "@/lib/security/permissions";
 import type { RequestAuthContext } from "@/lib/server/auth-context";
-import {
-  getDemoAccountSettings,
-  getWorkspace,
-  updateDemoAccountSettings,
-  type DemoMembership,
-} from "@/lib/server/demo-store";
+import type { DemoMembership } from "@/lib/server/demo-store";
+import { getRepositories } from "@/lib/server/repositories";
 
 export type SettingsServiceErrorStatus = 400 | 401 | 403 | 404;
 
@@ -64,7 +60,10 @@ export function updateAccountSettings(
     return validation;
   }
 
-  updateDemoAccountSettings(access.data.context.activeMembership.id, validation.data);
+  getRepositories().accountSettings.updateForMembership(
+    access.data.context.activeMembership.id,
+    validation.data,
+  );
 
   return {
     ok: true,
@@ -76,14 +75,10 @@ export function selectAccountWorkspace(
   context: RequestAuthContext,
   workspaceId: string,
 ): SettingsServiceResult<{ workspaceId: string }> {
-  const access = getSettingsAccess(context);
+  const access = getWorkspaceSelectionAccess(context);
 
   if (!access.ok) {
     return access;
-  }
-
-  if (!hasPermission(access.data.context.activeMembership, "workspace.select")) {
-    return forbidden("You do not have permission to switch workspaces.");
   }
 
   const requestedWorkspaceId = workspaceId.trim();
@@ -97,7 +92,7 @@ export function selectAccountWorkspace(
   const membership = access.data.context.memberships.find(
     (candidate) => candidate.workspaceId === requestedWorkspaceId,
   );
-  const workspace = getWorkspace(requestedWorkspaceId);
+  const workspace = getRepositories().access.getWorkspace(requestedWorkspaceId);
 
   if (!membership || !workspace) {
     return forbidden("You are not a member of this workspace.");
@@ -109,19 +104,48 @@ export function selectAccountWorkspace(
 function getSettingsAccess(
   context: RequestAuthContext,
 ): SettingsServiceResult<{ context: AuthenticatedContext }> {
-  if (context.status === "unauthenticated") {
-    return authRequired();
+  const access = getAuthenticatedAccess(context);
+
+  if (!access.ok) {
+    return access;
   }
 
-  if (!hasPermission(context.activeMembership, "account.manage_self")) {
+  if (!hasPermission(access.data.context.activeMembership, "account.manage_self")) {
     return forbidden("You do not have permission to manage account settings.");
+  }
+
+  return access;
+}
+
+function getWorkspaceSelectionAccess(
+  context: RequestAuthContext,
+): SettingsServiceResult<{ context: AuthenticatedContext }> {
+  const access = getAuthenticatedAccess(context);
+
+  if (!access.ok) {
+    return access;
+  }
+
+  if (!hasPermission(access.data.context.activeMembership, "workspace.select")) {
+    return forbidden("You do not have permission to switch workspaces.");
+  }
+
+  return access;
+}
+
+function getAuthenticatedAccess(
+  context: RequestAuthContext,
+): SettingsServiceResult<{ context: AuthenticatedContext }> {
+  if (context.status === "unauthenticated") {
+    return authRequired();
   }
 
   return { ok: true, data: { context } };
 }
 
 function toAccountSettingsResponse(context: AuthenticatedContext): AccountSettingsResponseDto {
-  const settings = getDemoAccountSettings(context.activeMembership.id);
+  const { accountSettings } = getRepositories();
+  const settings = accountSettings.getForMembership(context.activeMembership.id);
   const aiUsagePercent =
     settings.monthlyAiLimit > 0
       ? Math.round((settings.monthlyAiUsed / settings.monthlyAiLimit) * 100)
@@ -173,7 +197,7 @@ function toAccountWorkspaceDto(
   membership: DemoMembership,
   activeWorkspaceId: string,
 ): AccountWorkspaceDto {
-  const workspace = getWorkspace(membership.workspaceId);
+  const workspace = getRepositories().access.getWorkspace(membership.workspaceId);
 
   return {
     id: membership.workspaceId,
